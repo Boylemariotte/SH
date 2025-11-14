@@ -1,0 +1,585 @@
+import React, { useState } from 'react';
+import { Heart, Star, Trophy, Sparkles, CheckCircle, XCircle, Zap, Loader, Award } from 'lucide-react';
+import { usePoints } from './hooks/usePoints';
+
+function App() {
+  // 🔑 API KEY desde variables de entorno (ahora usa Groq)
+  const API_KEY = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.VITE_HUGGINGFACE_API_KEY;
+  
+  const [screen, setScreen] = useState('input'); // Cambiado de 'setup' a 'input'
+  const [topic, setTopic] = useState('');
+  const [difficulty, setDifficulty] = useState('medio');
+  const [numQuestions, setNumQuestions] = useState(5);
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [streak, setStreak] = useState(0);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [error, setError] = useState('');
+  const [userAnswers, setUserAnswers] = useState([]);
+  const [earnedPoints, setEarnedPoints] = useState(0);
+  
+  // Hook de puntos
+  const { totalPoints, calculatePoints, addPoints, POINTS_BY_DIFFICULTY } = usePoints();
+
+  const generateQuizWithAI = async (topicInput) => {
+    try {
+      setError('');
+      
+      const difficultyPrompts = {
+        facil: 'Las preguntas deben ser básicas y para principiantes, con respuestas directas.',
+        medio: 'Las preguntas deben ser de nivel intermedio, requiriendo comprensión del tema.',
+        dificil: 'Las preguntas deben ser avanzadas y desafiantes, requiriendo conocimiento profundo.',
+        experto: 'Las preguntas deben ser de nivel experto, con detalles técnicos y conceptos avanzados.'
+      };
+      
+      const prompt = `Genera exactamente ${numQuestions} preguntas de opción múltiple sobre el tema: "${topicInput}".
+
+NIVEL DE DIFICULTAD: ${difficulty.toUpperCase()}
+${difficultyPrompts[difficulty]}
+
+Responde ÚNICAMENTE con un array JSON válido, sin texto adicional antes o después.
+
+Formato requerido:
+[
+  {
+    "question": "Pregunta clara y específica sobre el tema",
+    "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+    "correct": 0
+  }
+]
+
+El campo "correct" debe ser el índice (0-3) de la respuesta correcta.
+Asegúrate de que las preguntas sean educativas, las opciones sean plausibles y en español.
+IMPORTANTE: Las opciones incorrectas deben ser convincentes y relacionadas con el tema.`;
+
+      const response = await fetch('http://localhost:3001/api/generate-quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          apiKey: API_KEY
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error response:', response.status, errorData);
+        throw new Error(errorData.error || errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('API Response:', data);
+      
+      // Procesar respuesta de Groq (formato OpenAI)
+      let content = '';
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        content = data.choices[0].message.content;
+      } else if (Array.isArray(data) && data.length > 0) {
+        content = data[0].generated_text || data[0];
+      } else if (data.generated_text) {
+        content = data.generated_text;
+      } else if (typeof data === 'string') {
+        content = data;
+      }
+      console.log('Generated content:', content);
+      
+      let cleanContent = content.trim();
+      const jsonMatch = cleanContent.match(/\[[\s\S]*\]/);
+      
+      if (!jsonMatch) {
+        throw new Error('La IA no generó el formato correcto. Intenta de nuevo.');
+      }
+
+      const parsedQuestions = JSON.parse(jsonMatch[0]);
+      
+      if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
+        throw new Error('No se generaron preguntas válidas.');
+      }
+
+      const validQuestions = parsedQuestions.filter(q => 
+        q.question && 
+        Array.isArray(q.options) && 
+        q.options.length === 4 && 
+        typeof q.correct === 'number' && 
+        q.correct >= 0 && 
+        q.correct <= 3
+      );
+
+      if (validQuestions.length === 0) {
+        throw new Error('Las preguntas generadas no tienen el formato correcto.');
+      }
+
+      return validQuestions.slice(0, numQuestions);
+      
+    } catch (err) {
+      console.error('Error:', err);
+      throw new Error(err.message || 'Error al generar el quiz. Intenta de nuevo.');
+    }
+  };
+
+  const handleStartQuiz = async () => {
+    if (topic.trim()) {
+      setScreen('loading');
+      try {
+        const quiz = await generateQuizWithAI(topic);
+        setQuestions(quiz);
+        setUserAnswers([]);
+        setScreen('quiz');
+        setCurrentQuestion(0);
+        setScore(0);
+        setLives(3);
+        setStreak(0);
+      } catch (err) {
+        setError(err.message);
+        setScreen('input');
+      }
+    }
+  };
+
+  const handleAnswerSelect = (index) => {
+    if (isAnswered) return;
+    
+    setSelectedAnswer(index);
+    setIsAnswered(true);
+    
+    const isCorrect = index === questions[currentQuestion].correct;
+    setUserAnswers([...userAnswers, { questionIndex: currentQuestion, answer: index, correct: isCorrect }]);
+    
+    if (isCorrect) {
+      setScore(score + 100 + (streak * 10));
+      setStreak(streak + 1);
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 1000);
+    } else {
+      setLives(lives - 1);
+      setStreak(0);
+    }
+  };
+
+  const handleNext = () => {
+    if (lives === 0) {
+      setScreen('results');
+      return;
+    }
+
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedAnswer(null);
+      setIsAnswered(false);
+    } else {
+      setScreen('results');
+    }
+  };
+
+  const handleRestart = () => {
+    setScreen('input');
+    setTopic('');
+    setDifficulty('medio');
+    setNumQuestions(5);
+    setQuestions([]);
+    setCurrentQuestion(0);
+    setSelectedAnswer(null);
+    setIsAnswered(false);
+    setScore(0);
+    setLives(3);
+    setStreak(0);
+    setError('');
+    setUserAnswers([]);
+    setEarnedPoints(0); // Resetear puntos ganados
+  };
+
+  if (screen === 'loading') {
+    return (
+      <div className="duo-container">
+        <div className="duo-card">
+          <div className="duo-loading">
+            <div className="duo-loading-spinner">
+              <Loader />
+            </div>
+            <h2 className="duo-loading-title">
+              Generando tu quiz...
+            </h2>
+            <p className="duo-loading-text">
+              La IA está creando preguntas sobre: <strong>{topic}</strong>
+            </p>
+            <div className="duo-progress-container">
+              <div className="duo-progress-bar">
+                <div className="duo-progress-fill" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'input') {
+    return (
+      <div className="duo-container">
+        <div className="duo-card">
+          {/* Badge de puntos totales */}
+          <div className="points-badge" style={{ 
+            position: 'absolute', 
+            top: '20px', 
+            right: '20px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            color: 'white',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            cursor: 'pointer'
+          }}>
+            <Award size={20} />
+            <span>{totalPoints} pts</span>
+          </div>
+          
+          <div className="duo-header">
+            <div className="duo-avatar duo-avatar-purple">
+              <Sparkles className="duo-avatar-icon" />
+            </div>
+            <h1 className="duo-title">Study Helper</h1>
+            <p className="duo-subtitle">Aprende Estudiando con IA</p>
+          </div>
+          
+          {error && (
+            <div className="duo-alert duo-alert-error">
+              ⚠️ {error}
+            </div>
+          )}
+          
+          <div className="duo-input-group">
+            <label className="duo-label">
+              ¿Sobre qué tema quieres aprender?
+            </label>
+            <input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleStartQuiz()}
+              placeholder="Ej: Fotosíntesis, Segunda Guerra Mundial, Python..."
+              className="duo-input"
+            />
+          </div>
+
+          <div className="duo-input-group">
+            <label className="duo-label">
+              🎯 Dificultad
+            </label>
+            <select 
+              value={difficulty} 
+              onChange={(e) => setDifficulty(e.target.value)}
+              className="duo-input"
+            >
+              <option value="facil">😊 Fácil - Para principiantes</option>
+              <option value="medio">🧠 Medio - Nivel intermedio</option>
+              <option value="dificil">🔥 Difícil - Desafiante</option>
+              <option value="experto">💎 Experto - Muy avanzado</option>
+            </select>
+          </div>
+
+          <div className="duo-input-group">
+            <label className="duo-label">
+              📊 Cantidad de preguntas
+            </label>
+            <select 
+              value={numQuestions} 
+              onChange={(e) => setNumQuestions(Number(e.target.value))}
+              className="duo-input"
+            >
+              <option value="3">3 preguntas - Rápido</option>
+              <option value="5">5 preguntas - Normal</option>
+              <option value="10">10 preguntas - Completo</option>
+              <option value="15">15 preguntas - Extenso</option>
+              <option value="20">20 preguntas - Maratón</option>
+            </select>
+          </div>
+          
+          {/* Información de puntos por dificultad */}
+          <div style={{
+            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            padding: '16px',
+            borderRadius: '12px',
+            marginBottom: '16px',
+            color: 'white'
+          }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Award size={18} />
+              Puntos por completar al 100%:
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px' }}>
+              <div>😊 Fácil: {POINTS_BY_DIFFICULTY.facil} pts</div>
+              <div>🧠 Medio: {POINTS_BY_DIFFICULTY.medio} pts</div>
+              <div>🔥 Difícil: {POINTS_BY_DIFFICULTY.dificil} pts</div>
+              <div>💎 Experto: {POINTS_BY_DIFFICULTY.experto} pts</div>
+            </div>
+            <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.9 }}>
+              * Puntos parciales si aciertas más del 50%
+            </div>
+          </div>
+          
+          <button
+            onClick={handleStartQuiz}
+            disabled={!topic.trim()}
+            className="duo-btn duo-btn-success"
+          >
+            Generar Quiz con IA
+          </button>
+          
+          <div className="duo-tip">
+            💡 Consejo: Sé específico con el tema para mejores preguntas
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'quiz' && questions.length > 0) {
+    const question = questions[currentQuestion];
+    const progress = ((currentQuestion + 1) / questions.length) * 100;
+
+    return (
+      <div className="duo-quiz-container">
+        {showCelebration && (
+          <div className="duo-celebration">
+            <div className="duo-celebration-content">
+              <div className="duo-celebration-emoji">🎉</div>
+              <div className="duo-celebration-text">¡Correcto!</div>
+            </div>
+          </div>
+        )}
+        
+        <div className="duo-quiz-header">
+          <div className="duo-stats">
+            <div className="duo-score">
+              <Zap className="duo-score-icon" />
+              <span className="duo-score-value">{score}</span>
+              {streak > 0 && (
+                <span className="duo-streak">
+                  🔥 {streak}
+                </span>
+              )}
+            </div>
+            
+            <div className="duo-hearts">
+              {[...Array(3)].map((_, i) => (
+                <Heart
+                  key={i}
+                  className={`duo-heart ${i < lives ? 'duo-heart-full' : 'duo-heart-empty'}`}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <div className="duo-progress-container">
+            <div className="duo-progress-bar">
+              <div className="duo-progress-fill" style={{ width: `${progress}%` }} />
+            </div>
+            <div className="duo-progress-text">
+              {currentQuestion + 1} de {questions.length}
+            </div>
+          </div>
+        </div>
+
+        <div className="duo-question-card">
+          <div className="duo-question-number">
+            Pregunta {currentQuestion + 1}
+          </div>
+          <h2 className="duo-question-text">
+            {question.question}
+          </h2>
+
+          <div className="duo-options">
+            {question.options.map((option, index) => {
+              const isCorrect = index === question.correct;
+              const isSelected = selectedAnswer === index;
+              
+              let className = 'duo-option';
+              let icon = null;
+
+              if (isAnswered) {
+                if (isCorrect) {
+                  className += ' duo-option-correct';
+                  icon = <CheckCircle className="duo-option-icon" />;
+                } else if (isSelected) {
+                  className += ' duo-option-incorrect';
+                  icon = <XCircle className="duo-option-icon" />;
+                }
+              }
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleAnswerSelect(index)}
+                  disabled={isAnswered}
+                  className={className}
+                >
+                  <span className="duo-option-text">{option}</span>
+                  {icon}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {isAnswered && (
+          <div className="duo-next-container">
+            <button
+              onClick={handleNext}
+              className="duo-btn duo-btn-continue"
+            >
+              {currentQuestion < questions.length - 1 ? 'Continuar' : 'Ver Resultados'}
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (screen === 'results') {
+    const correctAnswers = userAnswers.filter(a => a.correct).length;
+    const percentage = Math.round((correctAnswers / questions.length) * 100);
+    const passed = percentage >= 60;
+    
+    // Calcular y agregar puntos (solo una vez cuando se muestran los resultados)
+    if (earnedPoints === 0) {
+      const points = calculatePoints(difficulty, correctAnswers, questions.length);
+      setEarnedPoints(points);
+      if (points > 0) {
+        addPoints(points, {
+          topic,
+          difficulty,
+          correctAnswers,
+          totalQuestions: questions.length
+        });
+      }
+    }
+
+    return (
+      <div className="duo-container">
+        <div className="duo-card">
+          <div className="duo-results-header">
+            {passed ? (
+              <div className="duo-avatar duo-avatar-gold">
+                <Trophy className="duo-avatar-icon" />
+              </div>
+            ) : (
+              <div className="duo-avatar duo-avatar-silver">
+                <Star className="duo-avatar-icon" />
+              </div>
+            )}
+            
+            <h1 className="duo-title">
+              {passed ? '¡Felicitaciones! 🎉' : '¡Buen Intento! 💪'}
+            </h1>
+            <p className="duo-subtitle">
+              {passed ? 'Has completado el quiz exitosamente' : 'Sigue practicando para mejorar'}
+            </p>
+          </div>
+
+          <div className="duo-results-stats">
+            <div className="duo-results-score">
+              <div className="duo-results-score-value">{score}</div>
+              <div className="duo-results-score-label">puntos</div>
+            </div>
+            
+            <div className="duo-results-breakdown">
+              <div className="duo-results-item duo-results-correct">
+                <div className="duo-results-number">{correctAnswers}</div>
+                <div className="duo-results-label">Correctas</div>
+              </div>
+              <div className="duo-results-item duo-results-incorrect">
+                <div className="duo-results-number">{questions.length - correctAnswers}</div>
+                <div className="duo-results-label">Incorrectas</div>
+              </div>
+            </div>
+
+            <div className="duo-results-percentage">
+              <div className="duo-results-percentage-value">{percentage}%</div>
+              <div className="duo-results-percentage-label">de aciertos</div>
+            </div>
+            
+            {/* Puntos ganados */}
+            <div className={earnedPoints > 0 ? 'points-earned' : ''} style={{
+              background: earnedPoints > 0 
+                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                : 'linear-gradient(135deg, #868f96 0%, #596164 100%)',
+              padding: '20px',
+              borderRadius: '16px',
+              marginTop: '20px',
+              color: 'white',
+              textAlign: 'center',
+              boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '8px' }}>
+                <Award size={32} />
+                <div style={{ fontSize: '36px', fontWeight: 'bold' }}>
+                  {earnedPoints > 0 ? `+${earnedPoints}` : '0'}
+                </div>
+              </div>
+              <div style={{ fontSize: '16px', opacity: 0.9 }}>
+                {earnedPoints > 0 ? 'Puntos Ganados' : 'Sin puntos (necesitas al menos 50% de aciertos)'}
+              </div>
+              {earnedPoints > 0 && percentage === 100 && (
+                <div style={{ 
+                  marginTop: '12px', 
+                  fontSize: '14px', 
+                  background: 'rgba(255,255,255,0.2)', 
+                  padding: '8px 12px', 
+                  borderRadius: '8px',
+                  fontWeight: 'bold'
+                }}>
+                  🎯 ¡Perfecto! Obtuviste todos los puntos
+                </div>
+              )}
+            </div>
+            
+            {/* Total de puntos acumulados */}
+            <div style={{
+              marginTop: '16px',
+              padding: '16px',
+              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              borderRadius: '12px',
+              color: 'white',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '4px' }}>
+                Total Acumulado
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Trophy size={24} />
+                {totalPoints} puntos
+              </div>
+            </div>
+
+            <div className="duo-results-topic">
+              Tema: <strong>{topic}</strong><br />
+              Dificultad: <strong>{difficulty === 'facil' ? '😊 Fácil' : difficulty === 'medio' ? '🧠 Medio' : difficulty === 'dificil' ? '🔥 Difícil' : '💎 Experto'}</strong><br />
+              Preguntas: <strong>{questions.length}</strong>
+            </div>
+          </div>
+
+          <button
+            onClick={handleRestart}
+            className="duo-btn duo-btn-success"
+          >
+            Nuevo Quiz
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+export default App;
