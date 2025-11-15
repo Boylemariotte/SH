@@ -13,6 +13,16 @@ import './styles/guideStyles.css';
 import './styles/quizHistory.css';
 import './styles/FileUpload.css';
 
+// URL dinámica de la API
+const getApiUrl = () => {
+  // En producción (Vercel), usar rutas relativas
+  if (import.meta.env.PROD) {
+    return ''; // Rutas relativas: /api/endpoint
+  }
+  // En desarrollo, usar localhost
+  return 'http://localhost:3001';
+};
+
 function App() {
   // 🔑 API KEY desde variables de entorno (ahora usa Groq)
   const API_KEY = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.VITE_HUGGINGFACE_API_KEY;
@@ -115,7 +125,7 @@ El campo "correct" debe ser el índice (0-3) de la respuesta correcta.
 Asegúrate de que las preguntas sean educativas, las opciones sean plausibles y en español.
 IMPORTANTE: Las opciones incorrectas deben ser convincentes y relacionadas con el tema.`;
 
-      const response = await fetch('http://localhost:3001/api/generate-quiz', {
+      const response = await fetch(`${getApiUrl()}/api/generate-quiz`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

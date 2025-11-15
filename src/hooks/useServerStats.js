@@ -1,5 +1,15 @@
 import { useState, useCallback } from 'react';
 
+// URL dinámica de la API
+const getApiUrl = () => {
+  // En producción (Vercel), usar rutas relativas
+  if (import.meta.env.PROD) {
+    return ''; // Rutas relativas: /api/endpoint
+  }
+  // En desarrollo, usar localhost
+  return 'http://localhost:3001';
+};
+
 export const useServerStats = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -10,7 +20,7 @@ export const useServerStats = () => {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:3001/api/stats/save', {
+      const response = await fetch(`${getApiUrl()}/api/stats-save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -44,7 +54,7 @@ export const useServerStats = () => {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:3001/api/prompts/templates');
+      const response = await fetch(`${getApiUrl()}/api/prompts-templates`);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -65,7 +75,7 @@ export const useServerStats = () => {
   // Verificar salud del servidor
   const checkServerHealth = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/health');
+      const response = await fetch(`${getApiUrl()}/api/health`);
       const data = await response.json();
       return data;
     } catch (err) {
@@ -76,7 +86,7 @@ export const useServerStats = () => {
   // Verificar límites de rate limiting
   const checkRateLimit = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/rate-limit');
+      const response = await fetch(`${getApiUrl()}/api/rate-limit`);
       const data = await response.json();
       return data;
     } catch (err) {

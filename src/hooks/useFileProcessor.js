@@ -2,6 +2,16 @@ import { useState, useCallback } from 'react';
 
 const MAX_TEXT_LENGTH = 8000; // Máximo caracteres para la API
 
+// URL dinámica de la API
+const getApiUrl = () => {
+  // En producción (Vercel), usar rutas relativas
+  if (import.meta.env.PROD) {
+    return ''; // Rutas relativas: /api/endpoint
+  }
+  // En desarrollo, usar localhost
+  return 'http://localhost:3001';
+};
+
 export const useFileProcessor = () => {
   const [processedText, setProcessedText] = useState('');
   const [originalFileName, setOriginalFileName] = useState('');
@@ -137,7 +147,7 @@ Formato requerido:
 
 El campo "correct" debe ser el índice (0-3) de la respuesta correcta según el texto.`;
 
-    const response = await fetch('http://localhost:3001/api/generate-quiz', {
+    const response = await fetch(`${getApiUrl()}/api/generate-quiz`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -230,7 +240,7 @@ Formato de respuesta:
 - Usa un lenguaje claro y estructurado
 - La extensión debe ser de aproximadamente 1000-1500 palabras`;
 
-    const response = await fetch('http://localhost:3001/api/generate-quiz', {
+    const response = await fetch(`${getApiUrl()}/api/generate-quiz`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

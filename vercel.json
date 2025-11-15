@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "api/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/generate-quiz",
+      "dest": "/api/generate-quiz.js"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.js"
+    },
+    {
+      "src": "/api/stats-save",
+      "dest": "/api/stats-save.js"
+    },
+    {
+      "src": "/api/prompts-templates",
+      "dest": "/api/prompts-templates.js"
+    },
+    {
+      "src": "/api/rate-limit",
+      "dest": "/api/rate-limit.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/$1"
+    }
+  ],
+  "env": {
+    "NODE_VERSION": "18"
+  }
+}
