@@ -1,18 +1,5 @@
 import fetch from 'node-fetch';
-import rateLimit from 'express-rate-limit';
 import Joi from 'joi';
-
-// Rate limiting para Vercel (en memoria, funciona para serverless)
-const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
-  max: 20,
-  message: {
-    error: 'Too many requests. Please try again later.',
-    retryAfter: 60
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
 
 // Esquema de validación
 const quizRequestSchema = Joi.object({
@@ -21,11 +8,6 @@ const quizRequestSchema = Joi.object({
     'string.min': 'El prompt debe tener al menos 10 caracteres',
     'string.max': 'El prompt no puede exceder 10000 caracteres',
     'any.required': 'El prompt es requerido'
-  }),
-  apiKey: Joi.string().required().pattern(/^gsk_/).messages({
-    'string.empty': 'La API key es requerida',
-    'string.pattern.base': 'La API key debe empezar con "gsk_"',
-    'any.required': 'La API key es requerida'
   })
 });
 
@@ -44,16 +26,31 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Debug: Log del body recibido
+    console.log('Body recibido:', req.body);
+    console.log('Headers:', req.headers);
+    
     // Validar la petición
     const { error, value } = quizRequestSchema.validate(req.body);
     if (error) {
+      console.log('Error de validación:', error.details[0].message);
       return res.status(400).json({ 
         error: 'Validation failed', 
         details: error.details[0].message 
       });
     }
     
-    const { prompt, apiKey } = value;
+    const { prompt } = value;
+    
+    // Obtener API key de variables de entorno
+    const apiKey = process.env.GROQ_API_KEY;
+    
+    if (!apiKey) {
+      return res.status(500).json({
+        error: 'API key not configured on server',
+        type: 'config_error'
+      });
+    }
     
     // Validar contenido sospechoso
     const suspiciousPatterns = [/<script/i, /javascript:/i, /eval\(/i];

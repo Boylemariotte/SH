@@ -23,6 +23,16 @@ const getApiUrl = () => {
   return 'http://localhost:3001';
 };
 
+// Obtener API key según el entorno
+const getApiKey = () => {
+  // En producción, no enviar API key (la maneja el servidor)
+  if (import.meta.env.PROD) {
+    return null;
+  }
+  // En desarrollo, enviar API key del frontend
+  return import.meta.env.VITE_GROQ_API_KEY;
+};
+
 function App() {
   // 🔑 API KEY desde variables de entorno (ahora usa Groq)
   const API_KEY = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.VITE_HUGGINGFACE_API_KEY;
@@ -132,7 +142,7 @@ IMPORTANTE: Las opciones incorrectas deben ser convincentes y relacionadas con e
         },
         body: JSON.stringify({
           prompt: prompt,
-          apiKey: API_KEY
+          ...(getApiKey() && { apiKey: getApiKey() }) // Solo en desarrollo
         })
       });
 

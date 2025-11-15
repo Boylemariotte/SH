@@ -12,6 +12,16 @@ const getApiUrl = () => {
   return 'http://localhost:3001';
 };
 
+// Obtener API key según el entorno
+const getApiKey = () => {
+  // En producción, no enviar API key (la maneja el servidor)
+  if (import.meta.env.PROD) {
+    return null;
+  }
+  // En desarrollo, enviar API key del frontend
+  return import.meta.env.VITE_GROQ_API_KEY;
+};
+
 export const useFileProcessor = () => {
   const [processedText, setProcessedText] = useState('');
   const [originalFileName, setOriginalFileName] = useState('');
@@ -154,7 +164,7 @@ El campo "correct" debe ser el índice (0-3) de la respuesta correcta según el 
       },
       body: JSON.stringify({
         prompt: prompt,
-        apiKey: apiKey
+        ...(getApiKey() && { apiKey: getApiKey() }) // Solo en desarrollo
       })
     });
 
@@ -247,7 +257,7 @@ Formato de respuesta:
       },
       body: JSON.stringify({
         prompt: prompt,
-        apiKey: apiKey
+        ...(getApiKey() && { apiKey: getApiKey() }) // Solo en desarrollo
       })
     });
 
