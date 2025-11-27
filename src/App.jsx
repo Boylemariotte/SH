@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Star, Trophy, Sparkles, CheckCircle, XCircle, Zap, Loader, Award, BookOpen, Clock, ChevronDown, ChevronUp, FileText } from 'lucide-react';
+import { Heart, Star, Trophy, Sparkles, CheckCircle, XCircle, Zap, Loader, Award, BookOpen, Clock, ChevronDown, ChevronUp, FileText, BarChart } from 'lucide-react';
 import { usePoints } from './hooks/usePoints';
 import GuideInput from './components/GuideInput';
 import GuideViewer from './components/GuideViewer';
@@ -37,13 +37,13 @@ function App() {
   // 🔑 API KEY desde variables de entorno (ahora usa Groq)
   const API_KEY = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.VITE_HUGGINGFACE_API_KEY;
   
-  // Estado para controlar la visibilidad del historial
-  const [showHistory, setShowHistory] = useState(false);
+  // Estado para controlar la visibilidad del historial (REMOVED)
+  // const [showHistory, setShowHistory] = useState(false);
   
-  // Función para alternar la visibilidad del historial
-  const toggleHistory = () => {
-    setShowHistory(!showHistory);
-  };
+  // Función para alternar la visibilidad del historial (REMOVED)
+  // const toggleHistory = () => {
+  //   setShowHistory(!showHistory);
+  // };
   
   const [screen, setScreen] = useState('input'); // Cambiado de 'setup' a 'input'
   const [topic, setTopic] = useState('');
@@ -561,7 +561,7 @@ const handleBackToInput = () => {
           <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.75rem', fontWeight: '600' }}>¡Hola usuario!</h2>
           <p style={{ margin: '0 0 1rem 0', opacity: '0.9', fontSize: '1.1rem' }}>Bienvenido a tu plataforma de estudio</p>
           <button 
-            onClick={toggleHistory}
+            onClick={() => setScreen('stats')}
             style={{
               background: 'rgba(255, 255, 255, 0.2)',
               border: '1px solid rgba(255, 255, 255, 0.3)',
@@ -580,31 +580,11 @@ const handleBackToInput = () => {
               }
             }}
           >
-            {showHistory ? (
-              <>
-                <XCircle size={16} /> Ocultar Historial
-              </>
-            ) : (
-              <>
-                <Clock size={16} /> Ver Historial
-              </>
-            )}
+            <BarChart size={16} /> Ver Estadísticas
           </button>
         </div>
 
-        {/* Mostrar el historial si está activo */}
-        {showHistory && (
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto 2rem auto',
-            padding: '1.5rem',
-            background: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-          }}>
-            <QuizHistory history={quizHistory} />
-          </div>
-        )}
+        {/* Mostrar el historial si está activo (REMOVED - Moved to separate screen) */}
 
         {/* Tarjetas de estadísticas */}
         <StatsCards 
@@ -934,6 +914,70 @@ const handleBackToInput = () => {
               💡 Ideal para estudiar con tus propios apuntes y materiales
             </div>
           </div>
+
+          {/* Tarjeta de Estadísticas */}
+          <div className="duo-card" style={{
+            flex: '1',
+            minWidth: '400px',
+            maxWidth: '500px',
+            opacity: 1,
+            transition: 'all 0.3s ease',
+            ':hover': {
+              transform: 'translateY(-5px)',
+              boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
+            },
+            position: 'relative',
+            cursor: 'pointer'
+          }} onClick={() => setScreen('stats')}>
+            <div className="duo-header">
+              <div className="duo-avatar" style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' }}>
+                <BarChart className="duo-avatar-icon" />
+              </div>
+              <h1 className="duo-title">Estadísticas</h1>
+              <p className="duo-subtitle">Visualiza tu progreso y logros</p>
+            </div>
+            
+            <div style={{
+              background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+              padding: '16px',
+              borderRadius: '12px',
+              marginBottom: '16px',
+              color: 'white'
+            }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Trophy size={18} />
+                Tu Resumen:
+              </div>
+              <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                <li>Racha actual: {safeStats.dailyStreak} días</li>
+                <li>Total de Quizzes: {safeStats.totalQuizzes}</li>
+                <li>Precisión: {safeStats.accuracyPercentage}%</li>
+                <li>Puntos totales: {totalPoints}</li>
+              </ul>
+            </div>
+            
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setScreen('stats');
+              }}
+              className="duo-btn"
+              style={{
+                background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                color: 'white',
+                width: '100%',
+                ':hover': {
+                  background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)'
+                }
+              }}
+            >
+              Ver Detalles
+            </button>
+            
+            <div className="duo-tip">
+              💡 Revisa tu historial de aprendizaje
+            </div>
+          </div>
         </div>
         
         {error && (
@@ -977,6 +1021,60 @@ const handleBackToInput = () => {
         totalPoints={totalPoints}
         onRestart={handleRestart}
       />
+    );
+  }
+
+  if (screen === 'stats') {
+    return (
+      <div style={{ minHeight: '100vh', padding: '2rem 1rem' }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+        }}>
+          <button 
+            onClick={() => setScreen('input')}
+            style={{
+              background: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginBottom: '1rem',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              fontWeight: '500'
+            }}
+          >
+            <ChevronDown style={{ transform: 'rotate(90deg)' }} /> Volver al inicio
+          </button>
+
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#1f2937' }}>
+            Tu Progreso
+          </h1>
+
+          <StatsCards 
+            dailyStreak={safeStats.dailyStreak}
+            accuracyPercentage={safeStats.accuracyPercentage}
+            totalQuizzes={safeStats.totalQuizzes}
+          />
+
+          <div style={{ marginTop: '2rem' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1rem', color: '#374151' }}>
+              Historial de Actividad
+            </h2>
+            <div style={{
+              background: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              padding: '1.5rem'
+            }}>
+              <QuizHistory history={quizHistory} />
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
