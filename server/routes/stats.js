@@ -1,34 +1,20 @@
 import express from 'express';
-import { statsSchema } from '../validators/statsValidator.js';
+import {
+  getUserStats,
+  getPointsHistory,
+  getLeaderboard,
+  updatePreferences
+} from '../controllers/statsController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Endpoint para guardar estadísticas (opcional, para persistencia futura)
-router.post('/stats/save', async (req, res) => {
-  try {
-    const { error, value } = statsSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ 
-        error: 'Invalid stats data', 
-        details: error.details[0].message 
-      });
-    }
+// Todas las rutas requieren autenticación
+router.use(protect);
 
-    // Por ahora solo logueamos los datos
-    // En el futuro se guardarían en base de datos
-    console.log(`[${new Date().toISOString()}] Stats saved for user`);
-    
-    res.json({ 
-      success: true, 
-      message: 'Stats logged successfully',
-      timestamp: new Date().toISOString()
-    });
-    
-  } catch (error) {
-    console.error('Error saving stats:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
+router.get('/', getUserStats);
+router.get('/points', getPointsHistory);
+router.get('/leaderboard', getLeaderboard);
+router.put('/preferences', updatePreferences);
 
-export { router as statsRoutes };
-
+export default router;

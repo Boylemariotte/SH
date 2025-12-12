@@ -2,15 +2,25 @@ import express from 'express';
 import cors from 'cors';
 import fetch from 'node-fetch';
 import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
+import connectDB from './config/db.js';
+import authRoutes from './routes/auth.js';
 import { quizRoutes } from './routes/quiz.js';
+import quizzesRoutes from './routes/quizzes.js';
 import { healthRoutes } from './routes/health.js';
-import { statsRoutes } from './routes/stats.js';
+import statsNewRoutes from './routes/stats.js';
+import guidesRoutes from './routes/guides.js';
 import { promptsRoutes } from './routes/prompts.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 
+dotenv.config();
+
+// Conectar a la base de datos
+connectDB();
+
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
 // Rate limiting: máximo 20 peticiones por minuto
 const limiter = rateLimit({
@@ -30,9 +40,12 @@ app.use(express.json({ limit: '10mb' }));
 app.use(limiter);
 
 // Routes
-app.use('/api', quizRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api', quizRoutes); // Rutas existentes de quiz (generación con IA)
+app.use('/api/quizzes', quizzesRoutes); // Nuevas rutas CRUD de quizzes
 app.use('/api', healthRoutes);
-app.use('/api', statsRoutes);
+app.use('/api/stats', statsNewRoutes); // Rutas de estadísticas del usuario
+app.use('/api/guides', guidesRoutes); // Rutas de guías de estudio
 app.use('/api', promptsRoutes);
 
 // Error handlers (deben ir al final)

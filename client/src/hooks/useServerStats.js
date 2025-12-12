@@ -4,10 +4,10 @@ import { useState, useCallback } from 'react';
 const getApiUrl = () => {
   // En producción (Vercel), usar rutas relativas
   if (import.meta.env.PROD) {
-    return ''; // Rutas relativas: /api/endpoint
+    return import.meta.env.VITE_API_URL || ''; // Rutas relativas: /api/endpoint
   }
-  // En desarrollo, usar localhost
-  return 'http://localhost:3001';
+  // En desarrollo, usar localhost con puerto 5000
+  return 'http://localhost:5000';
 };
 
 export const useServerStats = () => {

@@ -6,10 +6,10 @@ const MAX_TEXT_LENGTH = 8000; // Máximo caracteres para la API
 const getApiUrl = () => {
   // En producción (Vercel), usar rutas relativas
   if (import.meta.env.PROD) {
-    return ''; // Rutas relativas: /api/endpoint
+    return import.meta.env.VITE_API_URL || ''; // Rutas relativas: /api/endpoint
   }
-  // En desarrollo, usar localhost
-  return 'http://localhost:3001';
+  // En desarrollo, usar localhost con puerto 5000
+  return 'http://localhost:5000';
 };
 
 // Obtener API key según el entorno
