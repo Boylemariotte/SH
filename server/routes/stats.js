@@ -1,26 +1,11 @@
-import Joi from 'joi';
+import express from 'express';
+import { statsSchema } from '../validators/statsValidator.js';
 
-export default async function handler(req, res) {
-  // Configurar CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+const router = express.Router();
 
+// Endpoint para guardar estadísticas (opcional, para persistencia futura)
+router.post('/stats/save', async (req, res) => {
   try {
-    const statsSchema = Joi.object({
-      userStats: Joi.object().required(),
-      quizHistory: Joi.array().required(),
-      pointsData: Joi.object().required()
-    });
-
     const { error, value } = statsSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ 
@@ -43,4 +28,7 @@ export default async function handler(req, res) {
     console.error('Error saving stats:', error);
     res.status(500).json({ error: error.message });
   }
-}
+});
+
+export { router as statsRoutes };
+

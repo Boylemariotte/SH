@@ -15,9 +15,9 @@ import './styles/FileUpload.css';
 
 // URL dinámica de la API
 const getApiUrl = () => {
-  // En producción (Vercel), usar rutas relativas
+  // En producción, usar la URL del servidor backend
   if (import.meta.env.PROD) {
-    return ''; // Rutas relativas: /api/endpoint
+    return import.meta.env.VITE_API_URL || 'http://localhost:3001';
   }
   // En desarrollo, usar localhost
   return 'http://localhost:3001';

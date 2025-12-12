@@ -1,17 +1,9 @@
-export default function handler(req, res) {
-  // Configurar CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+import express from 'express';
 
+const router = express.Router();
+
+// Endpoint para obtener plantillas de prompts predefinidos
+router.get('/prompts/templates', (req, res) => {
   const templates = {
     quiz: {
       basic: "Genera preguntas básicas sobre {topic}",
@@ -29,4 +21,7 @@ export default function handler(req, res) {
     templates,
     usage: "Reemplaza {topic} con tu tema específico"
   });
-}
+});
+
+export { router as promptsRoutes };
+
