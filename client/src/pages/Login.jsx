@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ArrowRight, Loader } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -47,9 +49,8 @@ const Login = () => {
         throw new Error(data.message || 'Error en la autenticación');
       }
 
-      // Guardar token y usuario
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data));
+      // Usar el contexto de autenticación para actualizar el estado
+      login(data);
       
       // Redirigir al dashboard
       navigate('/');

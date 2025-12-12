@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { User, Lock, Mail, ArrowRight, Loader } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -45,9 +47,8 @@ const Register = () => {
         throw new Error(data.message || 'Error en el registro');
       }
 
-      // Guardar token y usuario
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data));
+      // Usar el contexto de autenticación para actualizar el estado
+      login(data);
       
       // Redirigir al dashboard
       navigate('/');

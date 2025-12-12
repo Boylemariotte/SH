@@ -1,26 +1,43 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
 import LandingPage from './components/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import LoadingAuth from './components/LoadingAuth';
 
 // Componente para proteger rutas que requieren autenticación
 const ProtectedRoute = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  return user ? children : <Navigate to="/login" replace />;
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <LoadingAuth />;
+  }
+  
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
 // Componente para redirigir usuarios autenticados
 const PublicRoute = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  return user ? <Navigate to="/" replace /> : children;
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <LoadingAuth />;
+  }
+  
+  return isAuthenticated ? <Navigate to="/" replace /> : children;
 };
 
 // Componente para la ruta principal que muestra Landing o Dashboard según autenticación
 const HomeRoute = () => {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  return user ? <Dashboard /> : <LandingPage />;
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <LoadingAuth />;
+  }
+  
+  return isAuthenticated ? <Dashboard /> : <LandingPage />;
 };
 
 function App() {
