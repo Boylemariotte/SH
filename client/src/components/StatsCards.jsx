@@ -1,89 +1,42 @@
 import React from 'react';
+import { Zap, Target, BookOpen } from 'lucide-react';
+import Card from './Card';
 
 const StatsCards = ({ dailyStreak, accuracyPercentage, totalQuizzes }) => {
   return (
-    <div style={{
-      display: 'flex',
-      gap: '1.5rem',
-      justifyContent: 'center',
-      maxWidth: '1200px',
-      margin: '0 auto 2rem auto',
-      flexWrap: 'wrap'
-    }}>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mx-auto mb-12">
       {/* Racha diaria */}
-      <div style={{
-        minWidth: '140px',
-        padding: '1.5rem',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: '16px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        transition: 'transform 0.2s ease',
-        cursor: 'pointer'
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-      onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-      >
-        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔥</div>
-        <div style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
-          {dailyStreak}
+      <Card className="p-6 flex items-center gap-6" hoverEffect={true}>
+        <div className="w-16 h-16 rounded-2xl bg-accent-amber/10 dark:bg-accent-amber/20 flex items-center justify-center text-accent-amber shadow-inner">
+          <Zap size={32} fill="currentColor" />
         </div>
-        <div style={{ fontSize: '0.75rem', opacity: 0.9, textAlign: 'center' }}>Racha de días</div>
-      </div>
-      
+        <div>
+          <p className="text-xs font-black text-surface-400 dark:text-surface-500 uppercase tracking-widest mb-1 transition-colors">Racha Diaria</p>
+          <p className="text-2xl font-black text-surface-900 dark:text-surface-50 transition-colors uppercase tracking-tight">{dailyStreak} días</p>
+        </div>
+      </Card>
+
       {/* Porcentaje de aciertos */}
-      <div style={{
-        minWidth: '140px',
-        padding: '1.5rem',
-        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        borderRadius: '16px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        transition: 'transform 0.2s ease',
-        cursor: 'pointer'
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-      onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-      >
-        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎯</div>
-        <div style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
-          {accuracyPercentage}%
+      <Card className="p-6 flex items-center gap-6" hoverEffect={true}>
+        <div className="w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-500/10 flex items-center justify-center text-primary-600 dark:text-primary-400 shadow-inner">
+          <Target size={32} />
         </div>
-        <div style={{ fontSize: '0.75rem', opacity: 0.9, textAlign: 'center' }}>Aciertos</div>
-      </div>
-      
+        <div>
+          <p className="text-xs font-black text-surface-400 dark:text-surface-500 uppercase tracking-widest mb-1 transition-colors">Precisión</p>
+          <p className="text-2xl font-black text-surface-900 dark:text-surface-50 transition-colors uppercase tracking-tight">{accuracyPercentage}%</p>
+        </div>
+      </Card>
+
       {/* Total de quizzes */}
-      <div style={{
-        minWidth: '140px',
-        padding: '1.5rem',
-        background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        borderRadius: '16px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        transition: 'transform 0.2s ease',
-        cursor: 'pointer'
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-      onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-      >
-        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📚</div>
-        <div style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
-          {totalQuizzes}
+      <Card className="p-6 flex items-center gap-6" hoverEffect={true}>
+        <div className="w-16 h-16 rounded-2xl bg-secondary-100 dark:bg-secondary-500/10 flex items-center justify-center text-secondary-600 dark:text-secondary-400 shadow-inner">
+          <BookOpen size={32} />
         </div>
-        <div style={{ fontSize: '0.75rem', opacity: 0.9, textAlign: 'center' }}>Quizzes completados</div>
-      </div>
+        <div>
+          <p className="text-xs font-black text-surface-400 dark:text-surface-500 uppercase tracking-widest mb-1 transition-colors">Completados</p>
+          <p className="text-2xl font-black text-surface-900 dark:text-surface-50 transition-colors uppercase tracking-tight">{totalQuizzes} Quizzes</p>
+        </div>
+      </Card>
     </div>
   );
 };

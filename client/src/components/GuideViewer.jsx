@@ -4,7 +4,7 @@ import '../styles/guideStyles.css';
 
 const GuideViewer = ({ guide, onBack }) => {
   const [expandedSections, setExpandedSections] = useState({});
-  
+
   // Inicializar todas las secciones como expandidas
   useEffect(() => {
     const sections = {
@@ -17,7 +17,7 @@ const GuideViewer = ({ guide, onBack }) => {
     };
     setExpandedSections(sections);
   }, [guide]);
-  
+
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
       ...prev,
@@ -28,7 +28,7 @@ const GuideViewer = ({ guide, onBack }) => {
   // Función para formatear el texto con saltos de línea
   const formatGuideText = (text) => {
     if (!text) return [];
-    
+
     // Dividir por secciones principales
     const sections = {
       introduccion: '',
@@ -37,43 +37,43 @@ const GuideViewer = ({ guide, onBack }) => {
       aplicaciones: '',
       recursos: ''
     };
-    
+
     let currentSection = null;
-    
+
     text.split('\n').forEach(line => {
       const trimmedLine = line.trim();
-      
+
       // Identificar secciones principales
-      if (trimmedLine.toLowerCase().includes('introducción') || 
-          trimmedLine.toLowerCase().includes('introduccion')) {
+      if (trimmedLine.toLowerCase().includes('introducción') ||
+        trimmedLine.toLowerCase().includes('introduccion')) {
         currentSection = 'introduccion';
         sections[currentSection] += line + '\n';
       } else if (trimmedLine.toLowerCase().includes('conceptos clave')) {
         currentSection = 'conceptos';
         sections[currentSection] += line + '\n';
-      } else if (trimmedLine.toLowerCase().includes('ejemplos prácticos') || 
-                 trimmedLine.toLowerCase().includes('ejemplos practicos')) {
+      } else if (trimmedLine.toLowerCase().includes('ejemplos prácticos') ||
+        trimmedLine.toLowerCase().includes('ejemplos practicos')) {
         currentSection = 'ejemplos';
         sections[currentSection] += line + '\n';
-      } else if (trimmedLine.toLowerCase().includes('aplicaciones') || 
-                 trimmedLine.toLowerCase().includes('aplicación')) {
+      } else if (trimmedLine.toLowerCase().includes('aplicaciones') ||
+        trimmedLine.toLowerCase().includes('aplicación')) {
         currentSection = 'aplicaciones';
         sections[currentSection] += line + '\n';
-      } else if (trimmedLine.toLowerCase().includes('recursos') || 
-                 trimmedLine.toLowerCase().includes('bibliografía') ||
-                 trimmedLine.toLowerCase().includes('bibliografia')) {
+      } else if (trimmedLine.toLowerCase().includes('recursos') ||
+        trimmedLine.toLowerCase().includes('bibliografía') ||
+        trimmedLine.toLowerCase().includes('bibliografia')) {
         currentSection = 'recursos';
         sections[currentSection] += line + '\n';
       } else if (currentSection) {
         sections[currentSection] += line + '\n';
       }
     });
-    
+
     // Generar preguntas clave basadas en el contenido
     const generateKeyQuestions = () => {
       const questions = [];
       const content = text.toLowerCase();
-      
+
       if (content.includes('definición') || content.includes('definicion')) {
         questions.push(`¿Cuál es la definición precisa de ${guide.topic}?`);
       }
@@ -89,20 +89,20 @@ const GuideViewer = ({ guide, onBack }) => {
       if (content.includes('historia') || content.includes('origen')) {
         questions.push(`¿Cuál es el origen o historia de ${guide.topic}?`);
       }
-      
+
       // Asegurarse de tener al menos 3 preguntas
       while (questions.length < 3) {
         questions.push(`¿Cuáles son los aspectos más relevantes de ${guide.topic}?`);
       }
-      
+
       return questions;
     };
-    
+
     // Generar bibliografía específica según el tema
     const generateBibliography = () => {
       const topic = guide.topic.toLowerCase();
       const bibliografia = [];
-      
+
       // Mapeo de temas a recursos específicos
       const topicResources = {
         // Matemáticas
@@ -133,7 +133,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'geometría': 'matemática',
         'estadística': 'matemática',
         'trigonometría': 'matemática',
-        
+
         // Programación
         'programación': [
           {
@@ -163,7 +163,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'java': 'programación',
         'web development': 'programación',
         'desarrollo web': 'programación',
-        
+
         // Ciencias de la computación
         'algoritmo': [
           {
@@ -183,7 +183,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'estructura de datos': 'algoritmo',
         'ciencias de la computación': 'algoritmo',
         'computer science': 'algoritmo',
-        
+
         // Historia
         'historia': [
           {
@@ -208,7 +208,7 @@ const GuideViewer = ({ guide, onBack }) => {
         ],
         'historia universal': 'historia',
         'historia del mundo': 'historia',
-        
+
         // Ciencia
         'ciencia': [
           {
@@ -236,7 +236,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'biología': 'ciencia',
         'astronomía': 'ciencia',
         'geología': 'ciencia',
-        
+
         // Negocios y economía
         'economía': [
           {
@@ -257,7 +257,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'finanzas': 'economía',
         'negocios': 'economía',
         'emprendimiento': 'economía',
-        
+
         // Psicología
         'psicología': [
           {
@@ -277,7 +277,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'psicologia': 'psicología',
         'mente': 'psicología',
         'comportamiento': 'psicología',
-        
+
         // Idiomas
         'inglés': [
           {
@@ -303,12 +303,11 @@ const GuideViewer = ({ guide, onBack }) => {
         ],
         'ingles': 'inglés',
         'francés': 'inglés',
-        'francés': 'inglés',
         'alemán': 'inglés',
         'italiano': 'inglés',
         'portugués': 'inglés',
         'español': 'inglés',
-        
+
         // Medicina
         'medicina': [
           {
@@ -335,7 +334,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'anatomía': 'medicina',
         'fisiología': 'medicina',
         'enfermería': 'medicina',
-        
+
         // Derecho
         'derecho': [
           {
@@ -356,7 +355,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'constitucional': 'derecho',
         'penal': 'derecho',
         'civil': 'derecho',
-        
+
         // Ingeniería
         'ingeniería': [
           {
@@ -380,7 +379,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'industrial': 'ingeniería',
         'sistemas': 'ingeniería',
         'informática': 'ingeniería',
-        
+
         // Arte y diseño
         'arte': [
           {
@@ -412,10 +411,10 @@ const GuideViewer = ({ guide, onBack }) => {
         'gráfico': 'arte',
         'grafico': 'arte'
       };
-      
+
       // Buscar recursos específicos para el tema
       let recursosEspecificos = [];
-      
+
       // Primero buscamos coincidencias exactas
       for (const [key, value] of Object.entries(topicResources)) {
         if (topic.includes(key)) {
@@ -428,12 +427,12 @@ const GuideViewer = ({ guide, onBack }) => {
           }
         }
       }
-      
+
       // Si no encontramos recursos específicos, usamos una búsqueda más amplia
       if (recursosEspecificos.length === 0) {
         // Dividimos el tema en palabras clave
         const palabrasClave = topic.split(/\s+/);
-        
+
         // Buscamos cada palabra clave en los recursos
         for (const palabra of palabrasClave) {
           if (palabra.length > 3) { // Ignorar palabras muy cortas
@@ -449,7 +448,7 @@ const GuideViewer = ({ guide, onBack }) => {
           }
         }
       }
-      
+
       // Si aún no hay recursos específicos, usamos recursos generales
       if (recursosEspecificos.length === 0) {
         recursosEspecificos = [
@@ -523,18 +522,18 @@ const GuideViewer = ({ guide, onBack }) => {
           }
         ];
       }
-      
+
       // Limitar a 10 recursos como máximo
       return recursosEspecificos.slice(0, 10);
     };
-    
+
     const keyQuestions = generateKeyQuestions();
     const bibliography = generateBibliography();
-    
+
     // Función para renderizar el contenido de una sección
     const renderSectionContent = (content) => {
       if (!content) return null;
-      
+
       return content
         .split('\n')
         .filter(line => line.trim() !== '')
@@ -563,15 +562,15 @@ const GuideViewer = ({ guide, onBack }) => {
           return <p key={index} className="guide-paragraph">{line}</p>;
         });
     };
-    
+
     return (
       <>
         {/* Columna izquierda - Contenido principal */}
         <div className="guide-main-column">
           {/* Sección de Introducción */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('introduccion')}
             >
               <h2>📖 Introducción</h2>
@@ -587,11 +586,11 @@ const GuideViewer = ({ guide, onBack }) => {
               </div>
             )}
           </div>
-          
+
           {/* Sección de Conceptos Clave */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('conceptos')}
             >
               <h2>🔑 Conceptos Clave</h2>
@@ -607,11 +606,11 @@ const GuideViewer = ({ guide, onBack }) => {
               </div>
             )}
           </div>
-          
+
           {/* Sección de Ejemplos */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('ejemplos')}
             >
               <h2>📝 Ejemplos Prácticos</h2>
@@ -627,11 +626,11 @@ const GuideViewer = ({ guide, onBack }) => {
               </div>
             )}
           </div>
-          
+
           {/* Sección de Aplicaciones */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('aplicaciones')}
             >
               <h2>🌍 Aplicaciones</h2>
@@ -648,13 +647,13 @@ const GuideViewer = ({ guide, onBack }) => {
             )}
           </div>
         </div>
-        
+
         {/* Columna derecha - Recursos y preguntas */}
         <div className="guide-sidebar-column">
           {/* Preguntas Clave */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('preguntas')}
             >
               <h2>❓ Preguntas Clave</h2>
@@ -679,11 +678,11 @@ const GuideViewer = ({ guide, onBack }) => {
               </div>
             )}
           </div>
-          
+
           {/* Bibliografía */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('bibliografia')}
             >
               <h2>📚 Recursos</h2>
@@ -707,14 +706,14 @@ const GuideViewer = ({ guide, onBack }) => {
                       </div>
                     ))}
                   </div>
-                  
+
                   <h3>En línea:</h3>
                   <div className="online-resources">
                     {bibliography.filter(item => !item.type.includes('Libro')).map((item, index) => (
-                      <a 
-                        key={index} 
-                        href={item.url} 
-                        target="_blank" 
+                      <a
+                        key={index}
+                        href={item.url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="resource-link"
                       >
@@ -727,7 +726,7 @@ const GuideViewer = ({ guide, onBack }) => {
                       </a>
                     ))}
                   </div>
-                  
+
                   <div className="citation-note">
                     <p>📌 Cita estos recursos en trabajos académicos</p>
                   </div>
@@ -742,7 +741,7 @@ const GuideViewer = ({ guide, onBack }) => {
 
   return (
     <div className="guide-container">
-      <button 
+      <button
         onClick={onBack}
         className="back-button"
         aria-label="Volver al menú principal"
@@ -750,7 +749,7 @@ const GuideViewer = ({ guide, onBack }) => {
         <ArrowLeft size={20} style={{ marginRight: '8px' }} />
         Volver al menú
       </button>
-      
+
       <div className="guide-header">
         <div className="guide-icon">
           <BookOpen size={40} />
@@ -771,7 +770,7 @@ const GuideViewer = ({ guide, onBack }) => {
           </div>
         </div>
       </div>
-      
+
       <div className="guide-content">
         {guide.content ? (
           <div className="guide-text">
@@ -784,9 +783,9 @@ const GuideViewer = ({ guide, onBack }) => {
           </div>
         )}
       </div>
-      
+
       <div className="guide-actions">
-        <button 
+        <button
           onClick={() => window.print()}
           className="print-button"
         >
@@ -797,10 +796,10 @@ const GuideViewer = ({ guide, onBack }) => {
           </svg>
           Imprimir guía
         </button>
-        <button 
+        <button
           onClick={() => {
             const element = document.createElement('a');
-            const file = new Blob([document.querySelector('.guide-content').innerText], {type: 'text/plain'});
+            const file = new Blob([document.querySelector('.guide-content').innerText], { type: 'text/plain' });
             element.href = URL.createObjectURL(file);
             element.download = `Guia-de-Estudio-${guide.topic.replace(/\s+/g, '-')}.txt`;
             document.body.appendChild(element);
@@ -817,7 +816,7 @@ const GuideViewer = ({ guide, onBack }) => {
           Descargar como TXT
         </button>
       </div>
-      
+
       <div className="guide-footer">
         <p>© {new Date().getFullYear()} Study Helper con IA - Herramienta educativa</p>
       </div>

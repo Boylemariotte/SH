@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Lock, Mail, ArrowRight, Loader } from 'lucide-react';
+import { Lock, Mail, ArrowRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Button from '../components/Button';
+import Card from '../components/Card';
+import Input from '../components/Input';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -49,10 +52,7 @@ const Login = () => {
         throw new Error(data.message || 'Error en la autenticación');
       }
 
-      // Usar el contexto de autenticación para actualizar el estado
       login(data);
-      
-      // Redirigir al dashboard
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -62,94 +62,79 @@ const Login = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '1rem',
-      background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)'
-    }}>
-      <div className="duo-card" style={{ maxWidth: '400px', width: '100%' }}>
-        <div className="duo-header">
-          <div className="duo-avatar" style={{ background: 'linear-gradient(135deg, #6B46C1 0%, #805AD5 100%)' }}>
-            <Lock className="duo-avatar-icon" color="white" />
-          </div>
-          <h1 className="duo-title">Iniciar Sesión</h1>
-          <p className="duo-subtitle">Bienvenido de nuevo</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center p-6 bg-surface-50 relative overflow-hidden">
+      {/* Decorative Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-100/40 blur-[100px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary-100/40 blur-[100px]" />
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="duo-input-group">
-            <label className="duo-label">Correo Electrónico</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="duo-input"
-                style={{ paddingLeft: '36px' }}
-                placeholder="ejemplo@correo.com"
-                required
-              />
+      <div className="max-w-md w-full relative z-10 animate-slide-up">
+        <Card className="p-10 border-white/80">
+          <div className="text-center mb-10">
+            <div className="w-20 h-20 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary-500/20">
+              <Lock size={36} className="text-white" />
             </div>
+            <h1 className="text-3xl font-black text-surface-900 tracking-tight mb-2">
+              Bienvenido
+            </h1>
+            <p className="text-surface-500 font-medium">
+              Inicia sesión para continuar
+            </p>
           </div>
 
-          <div className="duo-input-group">
-            <label className="duo-label">Contraseña</label>
-            <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="duo-input"
-                style={{ paddingLeft: '36px' }}
-                placeholder="••••••••"
-                required
-                minLength={6}
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              label="Correo Electrónico"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="nombre@ejemplo.com"
+              required
+            />
+
+            <Input
+              label="Contraseña"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="••••••••"
+              required
+            />
+
+            {error && (
+              <div className="p-4 bg-accent-rose/10 border border-accent-rose/20 rounded-xl text-sm text-accent-rose font-bold flex items-center gap-2">
+                <span>⚠️</span> {error}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full py-4 text-lg"
+              isLoading={loading}
+              icon={ArrowRight}
+            >
+              Entrar
+            </Button>
+          </form>
+
+          <div className="mt-8 pt-6 border-t border-surface-200 text-center">
+            <p className="text-surface-500 font-medium">
+              ¿No tienes una cuenta?{' '}
+              <Link
+                to="/register"
+                className="text-primary-600 font-bold hover:text-primary-700 hover:underline transition-premium"
+              >
+                Regístrate gratis
+              </Link>
+            </p>
           </div>
+        </Card>
 
-          {error && (
-            <div className="duo-alert duo-alert-error" style={{ marginBottom: '1rem', padding: '0.75rem', fontSize: '0.9rem' }}>
-              ⚠️ {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="duo-btn duo-btn-success"
-            style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
-          >
-            {loading ? <Loader className="animate-spin" size={20} /> : 'Entrar'}
-            {!loading && <ArrowRight size={20} />}
-          </button>
-        </form>
-
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: '#6b7280' }}>
-          ¿No tienes una cuenta?{' '}
-          <Link to="/register" style={{ 
-            color: '#6B46C1', 
-            fontWeight: '600', 
-            textDecoration: 'underline',
-            cursor: 'pointer'
-          }}>
-            Regístrate
-          </Link>
-        </div>
-
-        <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-          <Link to="/" style={{ 
-            color: '#6b7280', 
-            fontSize: '0.9rem',
-            textDecoration: 'none'
-          }}>
+        <div className="mt-8 text-center">
+          <Link to="/" className="text-sm font-bold text-surface-400 hover:text-primary-600 transition-premium">
             ← Volver al inicio
           </Link>
         </div>
