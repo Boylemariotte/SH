@@ -7,7 +7,7 @@
 
 Por medio de la presente, se informa sobre los problemas técnicos encontrados durante la fase de desarrollo reciente, específicamente en la implementación del módulo de "Historial".
 
-Con el objetivo de optimizar el tiempo de desarrollo y reducir la complejidad del código (ahorro de líneas de código), se procedió a utilizar herramientas de asistencia basadas en Inteligencia Artificial para la generación de parte de la lógica de este módulo. Sin embargo, esta integración resultó en efectos colaterales críticos no previstos.
+Con el objetivo de optimizar el tiempo de desarrollo y reducir la complejidad del código (ahorro de líneas de código), se procedió a utilizar herramientas de asistencia basadas en Inteligencia Artificial para la generación de parte de la lógica de este módulo. Sin embargo, esta integración resultó en efectos colaterales críticos no previstos.aaaaaaaaa
 
 ## Impacto Técnico
 
