@@ -6,7 +6,7 @@ const MAX_TEXT_LENGTH = 8000; // Máximo caracteres para la API
 const getApiUrl = () => {
   // En producción (Vercel), usar rutas relativas
   if (import.meta.env.PROD) {
-    return ''; // Rutas relativas: /api/endpoint
+    return ''; // Pantillas relativas: /api/endpoint
   }
   // En desarrollo, usar localhost
   return 'http://localhost:3001';
@@ -80,11 +80,11 @@ export const useFileProcessor = () => {
   const processFile = useCallback(async (text, fileName) => {
     setIsProcessing(true);
     setError('');
-    
+
     try {
       // Preprocesar el texto
       const cleanedText = preprocessText(text);
-      
+
       if (cleanedText.length < 100) {
         throw new Error('El texto es demasiado corto para generar contenido significativo.');
       }
@@ -164,7 +164,7 @@ El campo "correct" debe ser el índice (0-3) de la respuesta correcta según el 
       },
       body: JSON.stringify({
         prompt: prompt,
-        ...(getApiKey() && { apiKey: getApiKey() }) // Solo en desarrollo
+        apiKey: apiKey || getApiKey()
       })
     });
 
@@ -174,7 +174,7 @@ El campo "correct" debe ser el índice (0-3) de la respuesta correcta según el 
     }
 
     const data = await response.json();
-    
+
     // Procesar respuesta de Groq (formato OpenAI)
     let content = '';
     if (data.choices && data.choices[0] && data.choices[0].message) {
@@ -186,26 +186,26 @@ El campo "correct" debe ser el índice (0-3) de la respuesta correcta según el 
     } else if (typeof data === 'string') {
       content = data;
     }
-    
+
     let cleanContent = content.trim();
     const jsonMatch = cleanContent.match(/\[[\s\S]*\]/);
-    
+
     if (!jsonMatch) {
       throw new Error('La IA no generó el formato correcto. Intenta de nuevo.');
     }
 
     const parsedQuestions = JSON.parse(jsonMatch[0]);
-    
+
     if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
       throw new Error('No se generaron preguntas válidas.');
     }
 
-    const validQuestions = parsedQuestions.filter(q => 
-      q.question && 
-      Array.isArray(q.options) && 
-      q.options.length === 4 && 
-      typeof q.correct === 'number' && 
-      q.correct >= 0 && 
+    const validQuestions = parsedQuestions.filter(q =>
+      q.question &&
+      Array.isArray(q.options) &&
+      q.options.length === 4 &&
+      typeof q.correct === 'number' &&
+      q.correct >= 0 &&
       q.correct <= 3
     );
 
@@ -257,7 +257,7 @@ Formato de respuesta:
       },
       body: JSON.stringify({
         prompt: prompt,
-        ...(getApiKey() && { apiKey: getApiKey() }) // Solo en desarrollo
+        apiKey: apiKey || getApiKey()
       })
     });
 
@@ -267,7 +267,7 @@ Formato de respuesta:
     }
 
     const data = await response.json();
-    
+
     let content = '';
     if (data.choices && data.choices[0] && data.choices[0].message) {
       content = data.choices[0].message.content;
@@ -278,7 +278,7 @@ Formato de respuesta:
     } else if (typeof data === 'string') {
       content = data;
     }
-    
+
     return {
       content: content.trim(),
       source: 'Archivo de texto',
@@ -286,7 +286,7 @@ Formato de respuesta:
       originalFileName: originalFileName,
       extractedTopics: extractedTopics
     };
-    
+
   }, [originalFileName, extractedTopics]);
 
   return {

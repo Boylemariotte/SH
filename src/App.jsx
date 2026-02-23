@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Star, Trophy, Sparkles, CheckCircle, XCircle, Zap, Loader, Award, BookOpen, Clock, ChevronDown, ChevronUp, FileText, BarChart } from 'lucide-react';
+import { Heart, Star, Trophy, Sparkles, CheckCircle, XCircle, Zap, Loader, Award, BookOpen, Clock, ChevronLeft, FileText, BarChart2, Settings, LogOut, AlertTriangle, ArrowRight } from 'lucide-react';
+import TiltCard from './components/TiltCard';
 import { usePoints } from './hooks/usePoints';
-import GuideInput from './components/GuideInput';
+import LandingPage from './components/LandingPage';
 import GuideViewer from './components/GuideViewer';
 import QuizHistory from './components/QuizHistory';
-import QuizScreen from './components/QuizScreen';
-import StatsCards from './components/StatsCards';
-import ResultsScreen from './components/ResultsScreen';
-import LoadingScreen from './components/LoadingScreen';
 import StudyFromFile from './components/StudyFromFile';
 import './styles/guideStyles.css';
 import './styles/quizHistory.css';
@@ -15,37 +12,185 @@ import './styles/FileUpload.css';
 
 // URL dinámica de la API
 const getApiUrl = () => {
-  // En producción (Vercel), usar rutas relativas
-  if (import.meta.env.PROD) {
-    return ''; // Rutas relativas: /api/endpoint
-  }
-  // En desarrollo, usar localhost
+  if (import.meta.env.PROD) return '';
   return 'http://localhost:3001';
 };
 
-// Obtener API key según el entorno
 const getApiKey = () => {
-  // En producción, no enviar API key (la maneja el servidor)
-  if (import.meta.env.PROD) {
-    return null;
-  }
-  // En desarrollo, enviar API key del frontend
+  if (import.meta.env.PROD) return null;
   return import.meta.env.VITE_GROQ_API_KEY;
 };
 
+// ─── Sidebar ───────────────────────────────────────────────────────────────
+const NAV_ITEMS = [
+  { id: 'input', label: 'Modo Quiz', icon: <Sparkles size={20} /> },
+  { id: 'guide_input', label: 'Guía de Estudio', icon: <BookOpen size={20} /> },
+  { id: 'study_from_file', label: 'Subir Archivo', icon: <FileText size={20} /> },
+  { id: 'stats', label: 'Estadísticas', icon: <BarChart2 size={20} /> },
+];
+
+function Sidebar({ screen, onNavigate, totalPoints, onLogout }) {
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-logo">
+        <span className="sidebar-logo-text">StudySmart AI</span>
+        <div className="sidebar-logo-icon"><Settings size={20} /></div>
+      </div>
+
+      <nav className="sidebar-nav">
+        {NAV_ITEMS.map(item => (
+          <button
+            key={item.id}
+            className={`sidebar-nav-item ${screen === item.id ? 'active' : ''}`}
+            onClick={() => onNavigate(item.id)}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      <div className="sidebar-footer">
+        <div className="sidebar-points">
+          <Award size={20} />
+          <span>{totalPoints} pts</span>
+        </div>
+        <button className="sidebar-logout-btn" onClick={onLogout}>
+          <LogOut size={20} />
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+// ─── Skeletons ─────────────────────────────────────────────────────────────
+function QuizSkeleton() {
+  return (
+    <div className="quiz-container">
+      <div className="quiz-header">
+        <div className="skeleton-base skeleton-title" style={{ width: '40%', margin: '0 auto 1rem' }} />
+        <div className="skeleton-base skeleton-text" style={{ width: '20%', margin: '0 auto' }} />
+      </div>
+      <div className="quiz-card">
+        <div className="skeleton-base skeleton-text" style={{ height: '1.5rem', width: '80%', marginBottom: '2rem' }} />
+        <div className="options-grid">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="skeleton-base skeleton-option" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GuideSkeleton() {
+  return (
+    <div className="guide-layout">
+      <div className="guide-nav-card shadow-sm">
+        <div className="skeleton-base skeleton-text" style={{ height: '1.2rem', marginBottom: '1.5rem' }} />
+        <div className="skeleton-base skeleton-text" style={{ width: '70%' }} />
+        <div className="skeleton-base skeleton-text" style={{ width: '50%' }} />
+        <div className="skeleton-base skeleton-text" style={{ width: '60%' }} />
+      </div>
+      <div className="guide-content-area shadow-sm">
+        <div className="skeleton-base skeleton-title" />
+        <div className="skeleton-base skeleton-text" />
+        <div className="skeleton-base skeleton-text" />
+        <div className="skeleton-base skeleton-text" style={{ width: '80%' }} />
+        <div className="skeleton-base skeleton-text" style={{ width: '40%', marginTop: '2rem' }} />
+        <div className="skeleton-base skeleton-text" />
+        <div className="skeleton-base skeleton-text" style={{ width: '90%' }} />
+      </div>
+    </div>
+  );
+}
+
+// ─── Logout Modal ───────────────────────────────────────────────────────────
+function LogoutModal({ onConfirm, onCancel }) {
+  return (
+    <div className="modal-overlay">
+      <div className="modal-box">
+        <div className="modal-icon"><AlertTriangle size={32} color="#f59e0b" /></div>
+        <h2 className="modal-title">¿Cerrar sesión?</h2>
+        <p className="modal-desc">
+          Se eliminarán tu historial, estadísticas y puntos guardados localmente.
+          Esta acción no se puede deshacer.
+        </p>
+        <div className="modal-actions">
+          <button className="btn btn-secondary" onClick={onCancel}>Cancelar</button>
+          <button className="btn btn-danger" onClick={onConfirm}>Sí, cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Streak Badge ───────────────────────────────────────────────────────────
+function StreakBadge({ streak }) {
+  return (
+    <div className="streak-badge">
+      <div className="streak-badge-icon">⚡</div>
+      <div className="streak-badge-info">
+        <span className="streak-badge-label">Racha</span>
+        <span className="streak-badge-value">{streak} días</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Rewards Panel ──────────────────────────────────────────────────────────
+function RewardsPanel({ POINTS_BY_DIFFICULTY }) {
+  return (
+    <div className="rewards-card">
+      <div className="rewards-title">
+        <Award size={18} /> Sistema de Recompensas
+      </div>
+      {[
+        { key: 'facil', label: 'Fácil' },
+        { key: 'medio', label: 'Medio' },
+        { key: 'dificil', label: 'Difícil' },
+        { key: 'experto', label: 'Experto' },
+      ].map(d => (
+        <div className="rewards-row" key={d.key}>
+          <span className="rewards-difficulty">{d.label}</span>
+          <span className="rewards-pts">{POINTS_BY_DIFFICULTY[d.key]} pts</span>
+        </div>
+      ))}
+      <p className="rewards-note">* Puntos parciales si aciertas más del 50%. ¡Sigue aprendiendo!</p>
+    </div>
+  );
+}
+
+// ─── Stats Cards Row ────────────────────────────────────────────────────────
+function StatsRow({ dailyStreak, accuracyPercentage, totalQuizzes }) {
+  return (
+    <div className="stats-row">
+      <TiltCard className="stat-card">
+        <span className="stat-emoji">🔥</span>
+        <span className="stat-value">{dailyStreak}</span>
+        <span className="stat-label">Racha de días</span>
+      </TiltCard>
+      <TiltCard className="stat-card">
+        <span className="stat-emoji">🎯</span>
+        <span className="stat-value">{accuracyPercentage}%</span>
+        <span className="stat-label">Aciertos</span>
+      </TiltCard>
+      <TiltCard className="stat-card">
+        <span className="stat-emoji">📚</span>
+        <span className="stat-value">{totalQuizzes}</span>
+        <span className="stat-label">Quizzes</span>
+      </TiltCard>
+    </div>
+  );
+}
+
+// ─── Main App ───────────────────────────────────────────────────────────────
 function App() {
-  // 🔑 API KEY desde variables de entorno (ahora usa Groq)
-  const API_KEY = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.VITE_HUGGINGFACE_API_KEY;
-  
-  // Estado para controlar la visibilidad del historial (REMOVED)
-  // const [showHistory, setShowHistory] = useState(false);
-  
-  // Función para alternar la visibilidad del historial (REMOVED)
-  // const toggleHistory = () => {
-  //   setShowHistory(!showHistory);
-  // };
-  
-  const [screen, setScreen] = useState('input'); // Cambiado de 'setup' a 'input'
+  const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+
+  const [screen, setScreen] = useState('input');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [topic, setTopic] = useState('');
   const [difficulty, setDifficulty] = useState('medio');
   const [numQuestions, setNumQuestions] = useState(5);
@@ -60,289 +205,157 @@ function App() {
   const [error, setError] = useState('');
   const [userAnswers, setUserAnswers] = useState([]);
   const [earnedPoints, setEarnedPoints] = useState(0);
-  
-  // Estados para la guía de estudio
   const [guide, setGuide] = useState(null);
   const [isGeneratingGuide, setIsGeneratingGuide] = useState(false);
-  
-  // Hook de puntos
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   const { totalPoints, calculatePoints, addPoints, POINTS_BY_DIFFICULTY } = usePoints();
-  
-  // Estados para estadísticas del usuario
+
   const [userStats, setUserStats] = useState(() => {
     const saved = localStorage.getItem('userStats');
     return saved ? JSON.parse(saved) : {
-      dailyStreak: 0,
-      lastQuizDate: null,
-      totalQuizzes: 0,
-      totalCorrectAnswers: 0,
-      totalQuestions: 0
+      dailyStreak: 0, lastQuizDate: null,
+      totalQuizzes: 0, totalCorrectAnswers: 0, totalQuestions: 0
     };
   });
 
-  // Load quiz history only once when component mounts (máximo 3 entradas)
   const [quizHistory, setQuizHistory] = useState(() => {
     try {
       const saved = localStorage.getItem('quizHistory');
       return saved ? JSON.parse(saved) : [];
-    } catch (error) {
-      console.error('Error loading quiz history:', error);
-      return [];
-    }
+    } catch { return []; }
   });
-  
 
-  // Calcular porcentaje de aciertos
-  const accuracyPercentage = userStats.totalQuestions > 0 
-    ? Math.round((userStats.totalCorrectAnswers / userStats.totalQuestions) * 100)
-    : 0;
-  
-  // Asegurar que los valores no sean NaN
+  const accuracyPercentage = userStats.totalQuestions > 0
+    ? Math.round((userStats.totalCorrectAnswers / userStats.totalQuestions) * 100) : 0;
+
   const safeStats = {
     dailyStreak: userStats.dailyStreak || 0,
     totalQuizzes: userStats.totalQuizzes || 0,
     accuracyPercentage: isNaN(accuracyPercentage) ? 0 : accuracyPercentage
   };
 
+  // ── AI helpers ─────────────────────────────────────────────────────────
   const generateQuizWithAI = async (topicInput) => {
-    try {
-      setError('');
-      
-      const difficultyPrompts = {
-        facil: 'Las preguntas deben ser básicas y para principiantes, con respuestas directas.',
-        medio: 'Las preguntas deben ser de nivel intermedio, requiriendo comprensión del tema.',
-        dificil: 'Las preguntas deben ser avanzadas y desafiantes, requiriendo conocimiento profundo.',
-        experto: 'Las preguntas deben ser de nivel experto, con detalles técnicos y conceptos avanzados.'
-      };
-      
-      const prompt = `Genera exactamente ${numQuestions} preguntas de opción múltiple sobre el tema: "${topicInput}".
-
-NIVEL DE DIFICULTAD: ${difficulty.toUpperCase()}
+    const difficultyPrompts = {
+      facil: 'Las preguntas deben ser básicas y para principiantes.',
+      medio: 'Las preguntas deben ser de nivel intermedio.',
+      dificil: 'Las preguntas deben ser avanzadas y desafiantes.',
+      experto: 'Las preguntas deben ser de nivel experto.'
+    };
+    const prompt = `Genera exactamente ${numQuestions} preguntas de opción múltiple sobre: "${topicInput}".
+NIVEL: ${difficulty.toUpperCase()}
 ${difficultyPrompts[difficulty]}
+Responde ÚNICAMENTE con un array JSON válido:
+[{"question":"...","options":["A","B","C","D"],"correct":0}]
+El campo "correct" es el índice de la respuesta correcta (0-3). En español.`;
 
-Responde ÚNICAMENTE con un array JSON válido, sin texto adicional antes o después.
+    console.log(`Solicitando quiz sobre: ${topicInput}...`);
 
-Formato requerido:
-[
-  {
-    "question": "Pregunta clara y específica sobre el tema",
-    "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
-    "correct": 0
-  }
-]
-
-El campo "correct" debe ser el índice (0-3) de la respuesta correcta.
-Asegúrate de que las preguntas sean educativas, las opciones sean plausibles y en español.
-IMPORTANTE: Las opciones incorrectas deben ser convincentes y relacionadas con el tema.`;
-
+    try {
       const response = await fetch(`${getApiUrl()}/api/generate-quiz`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          prompt: prompt,
-          ...(getApiKey() && { apiKey: getApiKey() }) // Solo en desarrollo
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, ...(getApiKey() && { apiKey: getApiKey() }) })
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Error response:', response.status, errorData);
-        throw new Error(errorData.error || errorData.message || `Error ${response.status}: ${response.statusText}`);
+        const err = await response.json().catch(() => ({}));
+        console.error('Error en respuesta API:', err);
+        throw new Error(err.error || `Error ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('API Response:', data);
-      
-      // Procesar respuesta de Groq (formato OpenAI)
-      let content = '';
-      if (data.choices && data.choices[0] && data.choices[0].message) {
-        content = data.choices[0].message.content;
-      } else if (Array.isArray(data) && data.length > 0) {
-        content = data[0].generated_text || data[0];
-      } else if (data.generated_text) {
-        content = data.generated_text;
-      } else if (typeof data === 'string') {
-        content = data;
-      }
-      console.log('Generated content:', content);
-      
-      let cleanContent = content.trim();
-      const jsonMatch = cleanContent.match(/\[[\s\S]*\]/);
-      
-      if (!jsonMatch) {
-        throw new Error('La IA no generó el formato correcto. Intenta de nuevo.');
+      console.log('Datos recibidos de la API:', data);
+
+      let content = data.choices?.[0]?.message?.content ?? data.generated_text ?? (typeof data === 'string' ? data : '');
+      const match = content.match(/\[[\s\S]*\]/);
+
+      if (!match) {
+        console.error('Contenido de IA no válido:', content);
+        throw new Error('La IA no generó el formato correcto.');
       }
 
-      const parsedQuestions = JSON.parse(jsonMatch[0]);
-      
-      if (!Array.isArray(parsedQuestions) || parsedQuestions.length === 0) {
-        throw new Error('No se generaron preguntas válidas.');
+      const parsed = JSON.parse(match[0]);
+      const valid = parsed.filter(q => q.question && Array.isArray(q.options) && q.options.length === 4 && typeof q.correct === 'number');
+
+      if (!valid.length) {
+        console.error('Preguntas filtradas no válidas:', parsed);
+        throw new Error('Preguntas con formato incorrecto.');
       }
 
-      const validQuestions = parsedQuestions.filter(q => 
-        q.question && 
-        Array.isArray(q.options) && 
-        q.options.length === 4 && 
-        typeof q.correct === 'number' && 
-        q.correct >= 0 && 
-        q.correct <= 3
-      );
-
-      if (validQuestions.length === 0) {
-        throw new Error('Las preguntas generadas no tienen el formato correcto.');
-      }
-
-      return validQuestions.slice(0, numQuestions);
-      
+      return valid.slice(0, numQuestions);
     } catch (err) {
-      console.error('Error:', err);
-      throw new Error(err.message || 'Error al generar el quiz. Intenta de nuevo.');
-  }
-};
+      console.error('Error en generateQuizWithAI:', err);
+      throw err;
+    }
+  };
 
-// Función para generar una guía de estudio con IA
-const generateGuideWithAI = async (topicInput, difficulty) => {
-  try {
-    setError('');
+  const generateGuideWithAI = async (topicInput, diff) => {
     setIsGeneratingGuide(true);
-    
-    const difficultyPrompts = {
-      facil: 'Explica los conceptos básicos de manera simple y directa, como si estuvieras enseñando a alguien que recién comienza a aprender sobre el tema. Incluye ejemplos sencillos y evita jerga técnica compleja sin explicación.',
-      medio: 'Proporciona una explicación detallada del tema, asumiendo que la persona tiene un conocimiento básico. Incluye conceptos clave, ejemplos prácticos y aplicaciones del tema.',
-      dificil: 'Ofrece un análisis en profundidad del tema, incluyendo conceptos avanzados, teorías y aplicaciones prácticas. Incluye ejemplos detallados y considera diferentes perspectivas o enfoques.',
-      experto: 'Desarrolla una guía completa y detallada a nivel universitario o profesional. Incluye conceptos avanzados, investigación actual, estudios de caso y aplicaciones prácticas. No evites la terminología técnica, pero asegúrate de explicarla claramente.'
-    };
-    
-    const prompt = `Crea una guía de estudio detallada sobre: "${topicInput}".
+    try {
+      const prompt = `Crea una guía de estudio detallada en español sobre: "${topicInput}".
+Nivel: ${diff.toUpperCase()}. 
+Incluye: introducción, conceptos clave, ejemplos prácticos, aplicaciones reales, recursos adicionales.
+Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
 
-NIVEL DE DIFICULTAD: ${difficulty.toUpperCase()}
-${difficultyPrompts[difficulty]}
-
-La guía debe estar bien estructurada con secciones claras y debe incluir:
-1. Una introducción al tema
-2. Conceptos clave
-3. Ejemplos prácticos
-4. Aplicaciones en el mundo real
-5. Recursos adicionales para seguir aprendiendo
-
-Formato de respuesta:
-- Usa títulos en negrita para las secciones principales
-- Usa viñetas para listas
-- Incluye ejemplos claros
-- Usa un lenguaje claro y conciso
-- La extensión debe ser de aproximadamente 1000-1500 palabras`;
-
-    const response = await fetch('http://localhost:3001/api/generate-quiz', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        prompt: prompt,
-        apiKey: API_KEY
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('Error response:', response.status, errorData);
-      throw new Error(errorData.error || errorData.message || `Error ${response.status}: ${response.statusText}`);
+      const response = await fetch(`${getApiUrl()}/api/generate-quiz`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, ...(getApiKey() && { apiKey: getApiKey() }) })
+      });
+      if (!response.ok) { const e = await response.json().catch(() => ({})); throw new Error(e.error || `Error ${response.status}`); }
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content ?? data.generated_text ?? '';
+      return { topic: topicInput, difficulty: diff, content: content.trim(), createdAt: new Date().toISOString() };
+    } finally {
+      setIsGeneratingGuide(false);
     }
+  };
 
-    const data = await response.json();
-    console.log('API Response:', data);
-    
-    // Procesar respuesta
-    let content = '';
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      content = data.choices[0].message.content;
-    } else if (Array.isArray(data) && data.length > 0) {
-      content = data[0].generated_text || data[0];
-    } else if (data.generated_text) {
-      content = data.generated_text;
-    } else if (typeof data === 'string') {
-      content = data;
-    }
-    
-    return {
-      topic: topicInput,
-      difficulty: difficulty,
-      content: content.trim(),
-      createdAt: new Date().toISOString()
-    };
-    
-  } catch (err) {
-    console.error('Error generating guide:', err);
-    throw new Error(err.message || 'Error al generar la guía. Intenta de nuevo.');
-  } finally {
-    setIsGeneratingGuide(false);
-  }
-};
-
-// Manejador para generar una guía de estudio
-const handleGenerateGuide = async () => {
-  if (!topic.trim()) return;
-  
-  try {
-    setScreen('guide_loading');
-    const generatedGuide = await generateGuideWithAI(topic, difficulty);
-    setGuide(generatedGuide);
-    setScreen('guide');
-  } catch (err) {
-    setError(err.message);
-    setScreen('input');
-  }
-};
-
-// Manejador para volver al menú principal
-const handleBackToMenu = () => {
-  setScreen('input');
-  setError('');
-};
-
+  // ── Handlers ────────────────────────────────────────────────────────────
   const handleStartQuiz = async (quizData = null, sourceInfo = null) => {
-    if (quizData) {
-      // Quiz desde archivo
+    setError('');
+
+    // Si quizData es un array, viene de un archivo pre-procesado
+    if (Array.isArray(quizData)) {
       setQuestions(quizData);
-      setUserAnswers([]);
-      setScreen('quiz');
-      setCurrentQuestion(0);
-      setScore(0);
-      setLives(3);
-      setStreak(0);
-      setTopic(sourceInfo?.fileName || 'Archivo de texto');
-    } else if (topic.trim()) {
-      // Quiz normal con IA
-      setScreen('loading');
-      try {
-        const quiz = await generateQuizWithAI(topic);
-        setQuestions(quiz);
-        setUserAnswers([]);
-        setScreen('quiz');
-        setCurrentQuestion(0);
-        setScore(0);
-        setLives(3);
-        setStreak(0);
-      } catch (err) {
-        setError(err.message);
-        setScreen('input');
-      }
+      setUserAnswers([]); setScreen('quiz');
+      setCurrentQuestion(0); setScore(0); setLives(3); setStreak(0);
+      setTopic(sourceInfo?.fileName || 'Archivo');
+      return;
+    }
+    if (!topic.trim()) return;
+    setScreen('loading');
+    try {
+      const quiz = await generateQuizWithAI(topic);
+      setQuestions(quiz); setUserAnswers([]); setScreen('quiz');
+      setCurrentQuestion(0); setScore(0); setLives(3); setStreak(0);
+    } catch (err) {
+      setError(err.message); setScreen('input');
+    }
+  };
+
+  const handleGenerateGuide = async () => {
+    if (!topic.trim()) return;
+    setError('');
+    try {
+      setScreen('guide_loading');
+      const g = await generateGuideWithAI(topic, difficulty);
+      setGuide(g); setScreen('guide');
+    } catch (err) {
+      setError(err.message); setScreen('guide_input');
     }
   };
 
   const handleAnswerSelect = (index) => {
     if (isAnswered) return;
-    
     setSelectedAnswer(index);
     setIsAnswered(true);
-    
     const isCorrect = index === questions[currentQuestion].correct;
     setUserAnswers([...userAnswers, { questionIndex: currentQuestion, answer: index, correct: isCorrect }]);
-    
     if (isCorrect) {
-      setScore(score + 100 + (streak * 10));
+      setScore(score + 100 + streak * 10);
       setStreak(streak + 1);
       setShowCelebration(true);
       setTimeout(() => setShowCelebration(false), 1000);
@@ -353,732 +366,383 @@ const handleBackToMenu = () => {
   };
 
   const handleNext = () => {
-    if (lives === 0) {
-      updateUserStats();
-      setScreen('results');
-      return;
-    }
-
-    if (currentQuestion < questions.length - 1) {
+    if (currentQuestion < questions.length - 1 && lives > 0) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
       setIsAnswered(false);
     } else {
-      updateUserStats();
-      setScreen('results');
+      handleFinish();
     }
-  };
-  
-  // Actualizar estadísticas del usuario
-  const updateUserStats = () => {
-    // Incluir la respuesta actual si existe
-    const allAnswers = [...userAnswers];
-    if (isAnswered && selectedAnswer !== null) {
-      const isCorrect = selectedAnswer === questions[currentQuestion].correct;
-      allAnswers.push({ questionIndex: currentQuestion, answer: selectedAnswer, correct: isCorrect });
-    }
-    
-    const correctAnswers = allAnswers.filter(a => a.correct).length;
-    const totalQuestions = allAnswers.length;
-    const percentage = Math.round((correctAnswers / questions.length) * 100);
-    
-    // Guardar en historial (máximo 3 entradas)
-    try {
-      const entry = {
-        timestamp: Date.now(),
-        score: percentage,
-        topic,
-        difficulty,
-        correctAnswers,
-        totalQuestions: questions.length,
-        questions: questions.map((q, idx) => {
-          const ua = allAnswers.find(a => a.questionIndex === idx);
-          const userIdx = ua ? ua.answer : null;
-          return {
-            question: q.question,
-            userAnswer: userIdx !== null && userIdx !== undefined ? q.options[userIdx] : null,
-            correctAnswer: q.options[q.correct]
-          };
-        })
-      };
-      
-      const newHistory = [entry, ...quizHistory].slice(0, 3); // Solo 3 entradas
-      setQuizHistory(newHistory);
-      localStorage.setItem('quizHistory', JSON.stringify(newHistory));
-    } catch (e) {
-      console.error('Error saving quiz history:', e);
-    }
-    
-    // Verificar si es un nuevo día para la racha
-    const today = new Date().toDateString();
-    const lastDate = userStats.lastQuizDate;
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toDateString();
-    
-    let newStreak = userStats.dailyStreak;
-    
-    if (lastDate !== today) {
-      // Si es un nuevo día
-      if (lastDate === yesterdayStr) {
-        // Si completó quiz ayer, incrementar racha
-        newStreak = userStats.dailyStreak + 1;
-      } else if (lastDate === null) {
-        // Primera vez
-        newStreak = 1;
-      } else {
-        // Se rompió la racha
-        newStreak = 1;
-      }
-    }
-    
-    const updatedStats = {
-      dailyStreak: newStreak,
-      lastQuizDate: today,
-      totalQuizzes: userStats.totalQuizzes + 1,
-      totalCorrectAnswers: userStats.totalCorrectAnswers + correctAnswers,
-      totalQuestions: userStats.totalQuestions + totalQuestions
-    };
-    
-    setUserStats(updatedStats);
-    localStorage.setItem('userStats', JSON.stringify(updatedStats));
   };
 
-  // Calcular y agregar puntos solo una vez al entrar a la pantalla de resultados
-  useEffect(() => {
-    if (screen === 'results' && earnedPoints === 0) {
-      const correctAnswers = userAnswers.filter(a => a.correct).length;
-      const points = calculatePoints(difficulty, correctAnswers, questions.length);
-      setEarnedPoints(points);
-      if (points > 0) {
-        addPoints(points, {
-          topic,
-          difficulty,
-          correctAnswers,
-          totalQuestions: questions.length
-        });
-      }
-    }
-  }, [screen]);
+  const handleFinish = () => {
+    const correctOnes = userAnswers.filter(a => a.correct).length;
+    const finalEarned = calculatePoints(correctOnes, questions.length, difficulty);
+    setEarnedPoints(finalEarned);
+    addPoints(finalEarned, `Quiz: ${topic}`);
+
+    const newStats = {
+      ...userStats,
+      totalQuizzes: userStats.totalQuizzes + 1,
+      totalCorrectAnswers: userStats.totalCorrectAnswers + correctOnes,
+      totalQuestions: userStats.totalQuestions + questions.length,
+      lastQuizDate: new Date().toISOString()
+    };
+    setUserStats(newStats);
+    localStorage.setItem('userStats', JSON.stringify(newStats));
+
+    const historyItem = {
+      topic, difficulty, score: correctOnes, total: questions.length,
+      date: new Date().toISOString(), points: finalEarned
+    };
+    const newHistory = [historyItem, ...quizHistory].slice(0, 50);
+    setQuizHistory(newHistory);
+    localStorage.setItem('quizHistory', JSON.stringify(newHistory));
+
+    setScreen('results');
+  };
 
   const handleRestart = () => {
+    setScreen('input'); setTopic(''); setDifficulty('medio'); setNumQuestions(5);
+    setQuestions([]); setCurrentQuestion(0); setSelectedAnswer(null);
+    setIsAnswered(false); setScore(0); setLives(3); setStreak(0);
+    setError(''); setUserAnswers([]); setEarnedPoints(0);
+  };
+
+  const handleNavigate = (id) => {
+    setError('');
+    if (id === 'input' || id === 'guide_input' || id === 'stats' || id === 'study_from_file') {
+      setScreen(id);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('userStats');
+    localStorage.removeItem('quizHistory');
+    localStorage.removeItem('userPoints');
+    localStorage.removeItem('pointsHistory');
+    setUserStats({ dailyStreak: 0, lastQuizDate: null, totalQuizzes: 0, totalCorrectAnswers: 0, totalQuestions: 0 });
+    setQuizHistory([]);
     setScreen('input');
     setTopic('');
     setDifficulty('medio');
     setNumQuestions(5);
     setQuestions([]);
-    setCurrentQuestion(0);
-    setSelectedAnswer(null);
-    setIsAnswered(false);
-    setScore(0);
-    setLives(3);
-    setStreak(0);
-    setError('');
-    setUserAnswers([]);
-    setEarnedPoints(0);
+    setScore(0); setLives(3); setStreak(0);
+    setError(''); setUserAnswers([]); setEarnedPoints(0);
+    setGuide(null);
+    setShowLogoutModal(false);
+    setIsLoggedIn(false);
+    localStorage.removeItem('isLoggedIn');
+    window.location.reload();
   };
 
-const handleBackToInput = () => {
-  setScreen('input');
-  setError('');
-};
+  const handleGetStarted = () => {
+    setIsLoggedIn(true);
+  };
 
-  // Renderizar la pantalla de carga del quiz
-  if (screen === 'loading') {
-    return <LoadingScreen topic={topic} />;
-  }
-
-  // Renderizar la pantalla de carga de guía
-  if (screen === 'guide_loading') {
-    return (
-      <div className="duo-container">
-        <div className="duo-card">
-          <div className="duo-loading">
-            <div className="duo-loading-spinner">
-              <Loader />
-            </div>
-            <h2 className="duo-loading-title">
-              Generando tu guía de estudio...
-            </h2>
-            <p className="duo-loading-text">
-              La IA está creando una guía personalizada sobre: <strong>{topic}</strong>
-            </p>
-            <div className="duo-progress-container">
-              <div className="duo-progress-bar">
-                <div className="duo-progress-fill" />
-              </div>
+  // ── Render Helpers ───────────────────────────────────────────────────────
+  const renderMainContent = () => {
+    // 1. Loading
+    if (screen === 'loading') {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div className="skeleton-overlay">
+            <div className="loading-card shadow-lg" style={{ width: '400px' }}>
+              <div className="loading-spinner"><Loader size={32} className="animate-spin" /></div>
+              <h2 className="loading-title" style={{ fontSize: '1.25rem' }}>Generando Quiz...</h2>
+              <p className="loading-text" style={{ fontSize: '0.9rem' }}>La IA está analizando <strong style={{ color: '#a78bfa' }}>{topic}</strong></p>
             </div>
           </div>
+          <QuizSkeleton />
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  // Renderizar la vista de la guía
-  if (screen === 'guide' && guide) {
-    return (
-      <div className="guide-container">
-        <GuideViewer guide={guide} onBack={handleBackToInput} />
-      </div>
-    );
-  }
-
-  // Renderizar pantalla de estudio desde archivo
-  if (screen === 'study_from_file') {
-    return (
-      <StudyFromFile
-        onBack={handleBackToInput}
-        onStartQuiz={handleStartQuiz}
-        onGenerateGuide={(guideData) => {
-          setGuide({
-            ...guideData,
-            topic: guideData.originalFileName || 'Archivo de texto'
-          });
-          setScreen('guide');
-        }}
-        API_KEY={API_KEY}
-        POINTS_BY_DIFFICULTY={POINTS_BY_DIFFICULTY}
-      />
-    );
-  }
-
-  // Renderizar el menú principal
-  if (screen === 'input' || screen === 'guide_input') {
-    return (
-      <div style={{ minHeight: '100vh', padding: '2rem 1rem' }}>
-        {/* Banner de bienvenida */}
-        <div style={{
-          background: 'linear-gradient(135deg, #6B46C1 0%, #805AD5 100%)',
-          color: 'white',
-          padding: '2rem',
-          maxWidth: '1200px',
-          margin: '0 auto 2rem auto',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          textAlign: 'center',
-          borderRadius: '16px',
-          position: 'relative'
-        }}>
-          <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.75rem', fontWeight: '600' }}>¡Hola usuario!</h2>
-          <p style={{ margin: '0 0 1rem 0', opacity: '0.9', fontSize: '1.1rem' }}>Bienvenido a tu plataforma de estudio</p>
-          <button 
-            onClick={() => setScreen('stats')}
-            style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              color: 'white',
-              padding: '0.5rem 1.5rem',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              fontSize: '0.9rem',
-              fontWeight: '500',
-              transition: 'all 0.2s ease',
-              ':hover': {
-                background: 'rgba(255, 255, 255, 0.3)'
-              }
-            }}
-          >
-            <BarChart size={16} /> Ver Estadísticas
-          </button>
+    if (screen === 'guide_loading') {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div className="skeleton-overlay">
+            <div className="loading-card shadow-lg" style={{ width: '400px' }}>
+              <div className="loading-spinner"><Loader size={32} className="animate-spin" /></div>
+              <h2 className="loading-title" style={{ fontSize: '1.25rem' }}>Creando Guía...</h2>
+              <p className="loading-text" style={{ fontSize: '0.9rem' }}>La IA está estructurando contenido</p>
+            </div>
+          </div>
+          <GuideSkeleton />
         </div>
+      );
+    }
 
-        {/* Mostrar el historial si está activo (REMOVED - Moved to separate screen) */}
+    // 2. Guide
+    if (screen === 'guide' && guide) {
+      return <GuideViewer guide={guide} onBack={() => setScreen('guide_input')} />;
+    }
 
-        {/* Tarjetas de estadísticas */}
-        <StatsCards 
-          dailyStreak={safeStats.dailyStreak}
-          accuracyPercentage={safeStats.accuracyPercentage}
-          totalQuizzes={safeStats.totalQuizzes}
+    // 3. Quiz
+    if (screen === 'quiz' && questions.length > 0) {
+      const q = questions[currentQuestion];
+      const progress = ((currentQuestion) / questions.length) * 100;
+      return (
+        <div className="quiz-shell" style={{ padding: 0, minHeight: 'auto' }}>
+          <div className="quiz-top-bar">
+            <div className="quiz-stats-row">
+              <div className="quiz-score-display">
+                <Star size={20} color="#f59e0b" fill="#f59e0b" />
+                <span>{score}</span>
+                {streak > 1 && <span className="quiz-streak-pill">🔥 ×{streak}</span>}
+              </div>
+              <div className="quiz-hearts">
+                {[...Array(3)].map((_, i) => (
+                  <Heart key={i} size={22} className="quiz-heart"
+                    color={i < lives ? '#ef4444' : '#2d2b3a'}
+                    fill={i < lives ? '#ef4444' : 'none'} />
+                ))}
+              </div>
+            </div>
+            <div className="quiz-progress-bar">
+              <div className="quiz-progress-fill" style={{ width: `${progress}%` }} />
+            </div>
+            <div className="quiz-progress-text">Pregunta {currentQuestion + 1} de {questions.length}</div>
+          </div>
+
+          <div className="quiz-question-card">
+            <div className="quiz-q-number">Pregunta {currentQuestion + 1}</div>
+            <p className="quiz-q-text">{q.question}</p>
+            <div className="quiz-options">
+              {q.options.map((opt, idx) => {
+                let cls = 'quiz-option';
+                if (isAnswered) {
+                  if (idx === q.correct) cls += ' quiz-option-correct';
+                  else if (idx === selectedAnswer) cls += ' quiz-option-incorrect';
+                }
+                return (
+                  <button key={idx} className={cls} onClick={() => handleAnswerSelect(idx)} disabled={isAnswered}>
+                    <span>{opt}</span>
+                    {isAnswered && idx === q.correct && <CheckCircle size={18} color="#10b981" />}
+                    {isAnswered && idx === selectedAnswer && idx !== q.correct && <XCircle size={18} color="#ef4444" />}
+                  </button>
+                );
+              })}
+            </div>
+            {isAnswered && (
+              <div className="quiz-next-btn">
+                <button className="btn btn-primary" onClick={handleNext}>
+                  {currentQuestion < questions.length - 1 && lives > 0 ? 'Siguiente →' : 'Ver Resultados'}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {showCelebration && (
+            <div className="celebration-overlay">
+              <div className="celebration-box">
+                <div className="celebration-emoji">🎉</div>
+                <div className="celebration-text">¡Correcto!</div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // 4. Results
+    if (screen === 'results') {
+      const correctAnswers = userAnswers.filter(a => a.correct).length;
+      const pct = Math.round((correctAnswers / questions.length) * 100);
+      return (
+        <div className="loading-screen" style={{ minHeight: '60vh', padding: 0 }}>
+          <div className="loading-card" style={{ maxWidth: 500 }}>
+            <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
+              {pct >= 80 ? '🏆' : pct >= 50 ? '🎯' : '💪'}
+            </div>
+            <div className="results-score-big">{pct}%</div>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Precisión</p>
+            <div className="results-breakdown">
+              <div className="results-item results-item-correct">
+                <div className="results-num">{correctAnswers}</div>
+                <div className="results-num-label">Correctas</div>
+              </div>
+              <div className="results-item results-item-incorrect">
+                <div className="results-num">{questions.length - correctAnswers}</div>
+                <div className="results-num-label">Incorrectas</div>
+              </div>
+            </div>
+            {earnedPoints > 0 && (
+              <div style={{ background: 'var(--accent-light)', border: '1px solid var(--border-hover)', borderRadius: 12, padding: '0.75rem', marginBottom: '1rem', color: 'var(--accent)', fontWeight: 700 }}>
+                <Award size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+                +{earnedPoints} puntos ganados
+              </div>
+            )}
+            <button className="btn btn-primary" onClick={handleRestart}>Volver al inicio</button>
+          </div>
+        </div>
+      );
+    }
+
+    // 5. File Upload
+    if (screen === 'study_from_file') {
+      return (
+        <StudyFromFile
+          onBack={() => setScreen('input')}
+          onStartQuiz={handleStartQuiz}
+          onGenerateGuide={(gd) => { setGuide({ ...gd, topic: gd.originalFileName || 'Archivo' }); setScreen('guide'); }}
+          API_KEY={API_KEY}
+          POINTS_BY_DIFFICULTY={POINTS_BY_DIFFICULTY}
         />
+      );
+    }
 
-        <div style={{ 
-          maxWidth: '1200px', 
-          margin: '0 auto', 
-          width: '100%',
-          boxSizing: 'border-box'
-        }}>
-
-        {/* Badge de puntos totales */}
-        <div className="points-badge" style={{ 
-          position: 'fixed', 
-          top: '120px',
-          right: '20px', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '8px',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          padding: '8px 16px',
-          borderRadius: '20px',
-          color: 'white',
-          fontWeight: 'bold',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-          cursor: 'pointer',
-          zIndex: 1000
-        }}>
-          <Award size={20} />
-          <span>{totalPoints} pts</span>
-        </div>
-
-        <div className="cards-container" style={{
-          display: 'flex',
-          gap: '2rem',
-          justifyContent: 'center',
-          flexWrap: 'wrap'
-        }}>
-          {/* Tarjeta de Quiz */}
-          <div className="duo-card" style={{
-            flex: '1',
-            minWidth: '400px',
-            maxWidth: '500px',
-            opacity: screen === 'input' ? 1 : 0.7,
-            transition: 'all 0.3s ease',
-            ':hover': {
-              opacity: 1,
-              transform: screen === 'input' ? 'translateY(-5px)' : 'none',
-              boxShadow: screen === 'input' ? '0 10px 25px rgba(0,0,0,0.1)' : '0 4px 6px rgba(0,0,0,0.1)'
-            },
-            position: 'relative',
-            cursor: screen === 'input' ? 'default' : 'pointer'
-          }} onClick={() => screen !== 'input' && setScreen('input')}>
-            <div className="duo-header">
-              <div className="duo-avatar duo-avatar-purple">
-                <Sparkles className="duo-avatar-icon" />
-              </div>
-              <h1 className="duo-title">Modo Quiz</h1>
-              <p className="duo-subtitle">Pon a prueba tus conocimientos</p>
+    // 6. Stats
+    if (screen === 'stats') {
+      return (
+        <>
+          <div className="page-header animate-fade-in-up stagger-1">
+            <div>
+              <h1 className="page-title">Tu Progreso</h1>
+              <p className="page-subtitle">Visualiza tu historial de aprendizaje y logros.</p>
             </div>
-            
-            <div className="duo-input-group">
-              <label className="duo-label">
-                ¿Sobre qué tema quieres aprender?
-              </label>
-              <input
-                type="text"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleStartQuiz()}
-                placeholder="Ej: Fotosíntesis, Segunda Guerra Mundial, Python..."
-                className="duo-input"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-
-            <div className="duo-input-group">
-              <label className="duo-label">
-                🎯 Dificultad
-              </label>
-              <select 
-                value={difficulty} 
-                onChange={(e) => setDifficulty(e.target.value)}
-                className="duo-input"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <option value="facil">😊 Fácil - Para principiantes</option>
-                <option value="medio">🧠 Medio - Nivel intermedio</option>
-                <option value="dificil">🔥 Difícil - Desafiante</option>
-                <option value="experto">💎 Experto - Muy avanzado</option>
-              </select>
-            </div>
-
-            <div className="duo-input-group">
-              <label className="duo-label">
-                📊 Cantidad de preguntas
-              </label>
-              <select 
-                value={numQuestions} 
-                onChange={(e) => setNumQuestions(Number(e.target.value))}
-                className="duo-input"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <option value="3">3 preguntas - Rápido</option>
-                <option value="5">5 preguntas - Normal</option>
-                <option value="10">10 preguntas - Completo</option>
-                <option value="15">15 preguntas - Extenso</option>
-                <option value="20">20 preguntas - Maratón</option>
-              </select>
-            </div>
-            
-            <div style={{
-              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-              padding: '16px',
-              borderRadius: '12px',
-              marginBottom: '16px',
-              color: 'white'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Award size={18} />
-                Puntos por completar al 100%:
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px' }}>
-                <div>😊 Fácil: {POINTS_BY_DIFFICULTY.facil} pts</div>
-                <div>🧠 Medio: {POINTS_BY_DIFFICULTY.medio} pts</div>
-                <div>🔥 Difícil: {POINTS_BY_DIFFICULTY.dificil} pts</div>
-                <div>💎 Experto: {POINTS_BY_DIFFICULTY.experto} pts</div>
-              </div>
-              <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.9 }}>
-                * Puntos parciales si aciertas más del 50%
-              </div>
-            </div>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleStartQuiz();
-              }}
-              disabled={!topic.trim()}
-              className="duo-btn duo-btn-success"
-              style={{ width: '100%' }}
-            >
-              Generar Quiz con IA
-            </button>
-            
-            <div className="duo-tip">
-              💡 Ideal para evaluar tu conocimiento con preguntas
-            </div>
+            <StreakBadge streak={safeStats.dailyStreak} />
           </div>
-
-          {/* Tarjeta de Guía de Estudio */}
-          <div className="duo-card" style={{
-            flex: '1',
-            minWidth: '400px',
-            maxWidth: '500px',
-            opacity: screen === 'guide_input' ? 1 : 0.7,
-            transition: 'all 0.3s ease',
-            ':hover': {
-              opacity: 1,
-              transform: screen === 'guide_input' ? 'translateY(-5px)' : 'none',
-              boxShadow: screen === 'guide_input' ? '0 10px 25px rgba(0,0,0,0.1)' : '0 4px 6px rgba(0,0,0,0.1)'
-            },
-            position: 'relative',
-            cursor: screen === 'guide_input' ? 'default' : 'pointer'
-          }} onClick={() => screen !== 'guide_input' && setScreen('guide_input')}>
-            <div className="duo-header">
-              <div className="duo-avatar" style={{ background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)' }}>
-                <BookOpen className="duo-avatar-icon" />
-              </div>
-              <h1 className="duo-title">Guía de Estudio</h1>
-              <p className="duo-subtitle">Aprende con guías personalizadas</p>
-            </div>
-            
-            <div className="duo-input-group">
-              <label className="duo-label">
-                ¿Sobre qué tema necesitas una guía?
-              </label>
-              <input
-                type="text"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && topic.trim() && handleGenerateGuide()}
-                placeholder="Ej: Fotosíntesis, Segunda Guerra Mundial, Python..."
-                className="duo-input"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-
-            <div className="duo-input-group">
-              <label className="duo-label">
-                🎯 Nivel de conocimiento
-              </label>
-              <select 
-                value={difficulty} 
-                onChange={(e) => setDifficulty(e.target.value)}
-                className="duo-input"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <option value="facil">😊 Principiante - Conceptos básicos</option>
-                <option value="medio">🧠 Intermedio - Conocimiento general</option>
-                <option value="dificil">🔥 Avanzado - Profundización</option>
-                <option value="experto">💎 Experto - Nivel universitario</option>
-              </select>
-            </div>
-            
-            <div style={{
-              background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
-              padding: '16px',
-              borderRadius: '12px',
-              marginBottom: '16px',
-              color: 'white'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <BookOpen size={18} />
-                Lo que incluye tu guía:
-              </div>
-              <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-                <li>Explicaciones claras y detalladas</li>
-                <li>Conceptos clave y ejemplos</li>
-                <li>Estructura organizada por temas</li>
-                <li>Contenido adaptado a tu nivel</li>
-              </ul>
-              <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.9 }}>
-                * La guía se generará con IA según el tema que elijas
-              </div>
-            </div>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleGenerateGuide();
-              }}
-              disabled={!topic.trim()}
-              className="duo-btn"
-              style={{
-                background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
-                color: 'white',
-                width: '100%',
-                ':hover': {
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
-                }
-              }}
-            >
-              {isGeneratingGuide ? (
-                <>
-                  <span className="duo-loading-spinner" style={{ marginRight: '8px' }}></span>
-                  Generando guía...
-                </>
-              ) : (
-                'Generar Guía de Estudio'
-              )}
-            </button>
-            
-            <div className="duo-tip">
-              💡 Perfecto para aprender un tema desde cero o profundizar
-            </div>
+          <div className="animate-fade-in-up stagger-2">
+            <StatsRow dailyStreak={safeStats.dailyStreak} accuracyPercentage={safeStats.accuracyPercentage} totalQuizzes={safeStats.totalQuizzes} />
           </div>
-
-          {/* Tarjeta de Estudio desde Archivo */}
-          <div className="duo-card" style={{
-            flex: '1',
-            minWidth: '400px',
-            maxWidth: '500px',
-            opacity: screen === 'study_from_file' ? 1 : 0.7,
-            transition: 'all 0.3s ease',
-            ':hover': {
-              opacity: 1,
-              transform: screen === 'study_from_file' ? 'translateY(-5px)' : 'none',
-              boxShadow: screen === 'study_from_file' ? '0 10px 25px rgba(0,0,0,0.1)' : '0 4px 6px rgba(0,0,0,0.1)'
-            },
-            position: 'relative',
-            cursor: screen === 'study_from_file' ? 'default' : 'pointer'
-          }} onClick={() => screen !== 'study_from_file' && setScreen('study_from_file')}>
-            <div className="duo-header">
-              <div className="duo-avatar" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
-                <FileText className="duo-avatar-icon" />
-              </div>
-              <h1 className="duo-title">Estudiar desde Archivo</h1>
-              <p className="duo-subtitle">Sube tus apuntes y genera contenido personalizado</p>
-            </div>
-            
-            <div style={{
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              padding: '16px',
-              borderRadius: '12px',
-              marginBottom: '16px',
-              color: 'white'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FileText size={18} />
-                ¿Qué puedes hacer?
-              </div>
-              <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-                <li>Subir archivos de texto (.txt)</li>
-                <li>Generar quizzes basados en tu contenido</li>
-                <li>Crear guías de estudio personalizadas</li>
-                <li>Extraer temas clave automáticamente</li>
-              </ul>
-              <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.9 }}>
-                * Máximo 1MB por archivo • Procesamiento inteligente con IA
-              </div>
-            </div>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setScreen('study_from_file');
-              }}
-              className="duo-btn"
-              style={{
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                color: 'white',
-                width: '100%',
-                ':hover': {
-                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)'
-                }
-              }}
-            >
-              Subir Archivo de Texto
-            </button>
-            
-            <div className="duo-tip">
-              💡 Ideal para estudiar con tus propios apuntes y materiales
-            </div>
+          <div className="ss-card animate-fade-in-up stagger-3">
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>Historial de Actividad</h2>
+            <QuizHistory history={quizHistory} />
           </div>
+        </>
+      );
+    }
 
-          {/* Tarjeta de Estadísticas */}
-          <div className="duo-card" style={{
-            flex: '1',
-            minWidth: '400px',
-            maxWidth: '500px',
-            opacity: 1,
-            transition: 'all 0.3s ease',
-            ':hover': {
-              transform: 'translateY(-5px)',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-            },
-            position: 'relative',
-            cursor: 'pointer'
-          }} onClick={() => setScreen('stats')}>
-            <div className="duo-header">
-              <div className="duo-avatar" style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' }}>
-                <BarChart className="duo-avatar-icon" />
-              </div>
-              <h1 className="duo-title">Estadísticas</h1>
-              <p className="duo-subtitle">Visualiza tu progreso y logros</p>
+    // 7. Input (Modo Quiz)
+    if (screen === 'guide_input') {
+      return (
+        <>
+          <div className="page-header animate-fade-in-up stagger-1">
+            <div>
+              <h1 className="page-title">Guía de Estudio</h1>
+              <p className="page-subtitle">Genera contenido personalizado con IA sobre cualquier tema.</p>
             </div>
-            
-            <div style={{
-              background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-              padding: '16px',
-              borderRadius: '12px',
-              marginBottom: '16px',
-              color: 'white'
-            }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Trophy size={18} />
-                Tu Resumen:
-              </div>
-              <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-                <li>Racha actual: {safeStats.dailyStreak} días</li>
-                <li>Total de Quizzes: {safeStats.totalQuizzes}</li>
-                <li>Precisión: {safeStats.accuracyPercentage}%</li>
-                <li>Puntos totales: {totalPoints}</li>
-              </ul>
-            </div>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setScreen('stats');
-              }}
-              className="duo-btn"
-              style={{
-                background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                color: 'white',
-                width: '100%',
-                ':hover': {
-                  background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)'
-                }
-              }}
-            >
-              Ver Detalles
-            </button>
-            
-            <div className="duo-tip">
-              💡 Revisa tu historial de aprendizaje
-            </div>
+            <StreakBadge streak={safeStats.dailyStreak} />
           </div>
-        </div>
-        
-        {error && (
-          <div className="duo-alert duo-alert-error" style={{ marginTop: '2rem', maxWidth: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
-            ⚠️ {error}
+          <div className="mode-layout">
+            <TiltCard className="ss-card animate-fade-in-up stagger-2">
+              {error && <div className="alert alert-error">⚠️ {error}</div>}
+              <div className="form-group">
+                <label className="form-label">¿Sobre qué tema necesitas una guía?</label>
+                <input type="text" className="form-input" value={topic} onChange={e => setTopic(e.target.value)} onKeyPress={e => e.key === 'Enter' && topic.trim() && handleGenerateGuide()} placeholder="Ej: Fotosíntesis, Revolución Francesa, Python..." />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Nivel de conocimiento</label>
+                <div className="select-wrapper">
+                  <select className="form-select" value={difficulty} onChange={e => setDifficulty(e.target.value)}>
+                    <option value="facil">😊 Principiante</option>
+                    <option value="medio">🧠 Intermedio</option>
+                    <option value="dificil">🔥 Avanzado</option>
+                    <option value="experto">💎 Experto</option>
+                  </select>
+                </div>
+              </div>
+              <button className="btn btn-blue btn-shimmer" onClick={handleGenerateGuide} disabled={!topic.trim() || isGeneratingGuide}>
+                <BookOpen size={18} /> {isGeneratingGuide ? 'Generando guía...' : 'Generar Guía de Estudio'}
+              </button>
+            </TiltCard>
+            <TiltCard className="rewards-card animate-fade-in-up stagger-3" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' }}>
+              <div className="rewards-title"><BookOpen size={18} /> Tu guía incluirá:</div>
+              {['Introducción y contexto', 'Conceptos clave explicados', 'Ejemplos prácticos', 'Aplicaciones en el mundo real', 'Recursos para seguir aprendiendo'].map((item, i) => (
+                <div className="rewards-row" key={i}><span className="rewards-difficulty">{item}</span><span>✓</span></div>
+              ))}
+              <p className="rewards-note">* Guía generada con IA adaptada a tu nivel</p>
+            </TiltCard>
           </div>
-        )}
-        </div>
-      </div>
-    );
-  }
+        </>
+      );
+    }
 
-  if (screen === 'quiz' && questions.length > 0) {
+    // Default: Modo Quiz Input
     return (
-      <QuizScreen
-        questions={questions}
-        currentQuestion={currentQuestion}
-        selectedAnswer={selectedAnswer}
-        isAnswered={isAnswered}
-        score={score}
-        lives={lives}
-        streak={streak}
-        showCelebration={showCelebration}
-        onAnswerSelect={handleAnswerSelect}
-        onNext={handleNext}
-      />
-    );
-  }
-
-  if (screen === 'results') {
-    const correctAnswers = userAnswers.filter(a => a.correct).length;
-
-    return (
-      <ResultsScreen
-        score={score}
-        correctAnswers={correctAnswers}
-        totalQuestions={questions.length}
-        topic={topic}
-        difficulty={difficulty}
-        earnedPoints={earnedPoints}
-        totalPoints={totalPoints}
-        onRestart={handleRestart}
-      />
-    );
-  }
-
-  if (screen === 'stats') {
-    return (
-      <div style={{ minHeight: '100vh', padding: '2rem 1rem' }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-        }}>
-          <button 
-            onClick={() => setScreen('input')}
-            style={{
-              background: 'white',
-              border: 'none',
-              padding: '0.5rem 1rem',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              marginBottom: '1rem',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              fontWeight: '500'
-            }}
-          >
-            <ChevronDown style={{ transform: 'rotate(90deg)' }} /> Volver al inicio
-          </button>
-
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#1f2937' }}>
-            Tu Progreso
-          </h1>
-
-          <StatsCards 
-            dailyStreak={safeStats.dailyStreak}
-            accuracyPercentage={safeStats.accuracyPercentage}
-            totalQuizzes={safeStats.totalQuizzes}
-          />
-
-          <div style={{ marginTop: '2rem' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1rem', color: '#374151' }}>
-              Historial de Actividad
-            </h2>
-            <div style={{
-              background: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              padding: '1.5rem'
-            }}>
-              <QuizHistory history={quizHistory} />
-            </div>
+      <>
+        <div className="page-header animate-fade-in-up stagger-1">
+          <div>
+            <h1 className="page-title">¿Qué vamos a aprender hoy?</h1>
+            <p className="page-subtitle">Configura tu quiz y desafía tus conocimientos con IA.</p>
           </div>
+          <StreakBadge streak={safeStats.dailyStreak} />
         </div>
-      </div>
+        <div className="mode-layout">
+          <TiltCard className="ss-card animate-fade-in-up stagger-2">
+            {error && <div className="alert alert-error">⚠️ {error}</div>}
+            <div className="form-group">
+              <label className="form-label">¿Sobre qué tema quieres aprender?</label>
+              <input type="text" className="form-input" value={topic} onChange={e => setTopic(e.target.value)} onKeyPress={e => e.key === 'Enter' && handleStartQuiz()} placeholder="Ej: Fotosíntesis, Revolución Francesa, React..." />
+            </div>
+            <div className="selects-row">
+              <div className="form-group">
+                <label className="form-label">Nivel</label>
+                <div className="select-wrapper">
+                  <div className="select-dot" />
+                  <select className="form-select has-dot" value={difficulty} onChange={e => setDifficulty(e.target.value)}>
+                    <option value="facil">Fácil</option>
+                    <option value="medio">Intermedio</option>
+                    <option value="dificil">Difícil</option>
+                    <option value="experto">Experto</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Preguntas</label>
+                <div className="select-wrapper">
+                  <select className="form-select" value={numQuestions} onChange={e => setNumQuestions(Number(e.target.value))}>
+                    <option value="3">3 rápidas</option>
+                    <option value="5">5 estándar</option>
+                    <option value="10">10 completo</option>
+                    <option value="15">15 extenso</option>
+                    <option value="20">20 maratón</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button className="btn btn-primary btn-shimmer" onClick={() => handleStartQuiz()} disabled={!topic.trim()}>
+              <Sparkles size={18} /> Generar Quiz con IA
+            </button>
+          </TiltCard>
+          <TiltCard className="animate-fade-in-up stagger-3" style={{ width: '100%', maxWidth: '380px' }}>
+            <RewardsPanel POINTS_BY_DIFFICULTY={POINTS_BY_DIFFICULTY} />
+          </TiltCard>
+        </div>
+      </>
+    );
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+      document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  if (!isLoggedIn) {
+    return (
+      <>
+        <div className="mouse-glow" />
+        <LandingPage onGetStarted={handleGetStarted} />
+      </>
     );
   }
 
-  return null;
+  return (
+    <div className="app-shell">
+      <div className="mouse-glow" />
+      <Sidebar screen={screen} onNavigate={handleNavigate} totalPoints={totalPoints} onLogout={() => setShowLogoutModal(true)} />
+      <main className="main-content">
+        {renderMainContent()}
+      </main>
+      {showLogoutModal && <LogoutModal onConfirm={handleLogout} onCancel={() => setShowLogoutModal(false)} />}
+    </div>
+  );
 }
 
 export default App;

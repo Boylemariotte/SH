@@ -89,7 +89,7 @@ const FileUpload = ({ onFileUpload, isLoading, error }) => {
 
   return (
     <div className="file-upload-container">
-      <div 
+      <div
         className={`file-upload-area ${isDragging ? 'dragging' : ''} ${fileName ? 'has-file' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -112,15 +112,16 @@ const FileUpload = ({ onFileUpload, isLoading, error }) => {
               <div className="file-name">{fileName}</div>
               <div className="file-size">{formatFileSize(fileSize)}</div>
             </div>
-            <button 
-              className="clear-file-btn"
+            <button
+              className="btn btn-secondary clear-file-btn"
               onClick={(e) => {
                 e.stopPropagation();
                 clearFile();
               }}
               disabled={isLoading}
+              style={{ padding: '0.5rem', minWidth: 'auto', height: 'auto' }}
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           </div>
         ) : (
