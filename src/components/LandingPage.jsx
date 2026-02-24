@@ -1,5 +1,6 @@
 import { Sparkles, ArrowRight, BookOpen, Zap, Trophy, Shield } from 'lucide-react';
 import TiltCard from './TiltCard';
+import AIRevealText from './AIRevealText';
 
 const LandingPage = ({ onGetStarted }) => {
     return (
@@ -12,7 +13,7 @@ const LandingPage = ({ onGetStarted }) => {
             <nav className="landing-nav">
                 <div className="landing-logo">
                     <Sparkles className="logo-icon" />
-                    <span>StudySmart AI</span>
+                    <span>StudyHelper AI</span>
                 </div>
                 <div className="landing-nav-links">
                     <a href="#features">Características</a>
@@ -30,8 +31,7 @@ const LandingPage = ({ onGetStarted }) => {
                     <span>Potenciado por Inteligencia Artificial</span>
                 </div>
                 <h1 className="hero-title animate-fade-in-up stagger-2">
-                    Domina cualquier tema <br />
-                    con <span className="gradient-text">Inteligencia Artificial</span>
+                    Potencia tu <span className="gradient-text"><AIRevealText text="Aprendizaje" delay={800} scrambleSpeed={60} /></span> con IA
                 </h1>
                 <p className="hero-subtitle animate-fade-in-up stagger-3">
                     La plataforma definitiva para estudiantes, profesionales y mentes curiosas.
@@ -74,7 +74,7 @@ const LandingPage = ({ onGetStarted }) => {
 
             {/* Footer Basic */}
             <footer className="landing-footer">
-                <p>© 2024 StudySmart AI. Desarrollado para el futuro del aprendizaje.</p>
+                <p>© 2024 StudyHelper AI. Desarrollado para el futuro del aprendizaje.</p>
             </footer>
         </div>
     );

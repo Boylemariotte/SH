@@ -1,11 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Heart, Star, Trophy, Sparkles, CheckCircle, XCircle, Zap, Loader, Award, BookOpen, Clock, ChevronLeft, FileText, BarChart2, Settings, LogOut, AlertTriangle, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Sparkles, BookOpen, Award, BarChart2, FileText, Settings, ArrowLeft, LogOut, AlertTriangle, Loader, Star, Heart, CheckCircle, XCircle } from 'lucide-react';
 import TiltCard from './components/TiltCard';
-import { usePoints } from './hooks/usePoints';
+import Sidebar from './components/Sidebar';
 import LandingPage from './components/LandingPage';
-import GuideViewer from './components/GuideViewer';
+import AuthWrapper from './components/AuthWrapper';
+import LogoutModal from './components/LogoutModal';
 import QuizHistory from './components/QuizHistory';
+import StatsRow from './components/StatsRow';
+import StreakBadge from './components/StreakBadge';
+import RewardsPanel from './components/RewardsPanel';
 import StudyFromFile from './components/StudyFromFile';
+import AppHeader from './components/AppHeader';
+import PointsDisplay from './components/PointsDisplay';
+import PointsCelebration from './components/PointsCelebration';
+import MicroConfetti from './components/MicroConfetti';
+import { APP_CONFIG, ANIMATION_CLASSES, DIFFICULTY_LABELS, QUIZ_COUNTS } from './constants/appConfig';
+import AIRevealText from './components/AIRevealText';
+import GuideViewer from './components/GuideViewer';
+import { usePoints } from './hooks/usePoints';
 import './styles/guideStyles.css';
 import './styles/quizHistory.css';
 import './styles/FileUpload.css';
@@ -24,45 +36,10 @@ const getApiKey = () => {
 // ─── Sidebar ───────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
   { id: 'input', label: 'Modo Quiz', icon: <Sparkles size={20} /> },
-  { id: 'guide_input', label: 'Guía de Estudio', icon: <BookOpen size={20} /> },
-  { id: 'study_from_file', label: 'Subir Archivo', icon: <FileText size={20} /> },
-  { id: 'stats', label: 'Estadísticas', icon: <BarChart2 size={20} /> },
+  { id: 'guide_input', label: APP_CONFIG.guideInputLabel, icon: <BookOpen size={20} /> },
+  { id: 'study_from_file', label: APP_CONFIG.studyFromFileLabel, icon: <FileText size={20} /> },
+  { id: 'stats', label: APP_CONFIG.statsLabel, icon: <BarChart2 size={20} /> },
 ];
-
-function Sidebar({ screen, onNavigate, totalPoints, onLogout }) {
-  return (
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        <span className="sidebar-logo-text">StudySmart AI</span>
-        <div className="sidebar-logo-icon"><Settings size={20} /></div>
-      </div>
-
-      <nav className="sidebar-nav">
-        {NAV_ITEMS.map(item => (
-          <button
-            key={item.id}
-            className={`sidebar-nav-item ${screen === item.id ? 'active' : ''}`}
-            onClick={() => onNavigate(item.id)}
-          >
-            {item.icon}
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </nav>
-
-      <div className="sidebar-footer">
-        <div className="sidebar-points">
-          <Award size={20} />
-          <span>{totalPoints} pts</span>
-        </div>
-        <button className="sidebar-logout-btn" onClick={onLogout}>
-          <LogOut size={20} />
-          <span>Cerrar sesión</span>
-        </button>
-      </div>
-    </aside>
-  );
-}
 
 // ─── Skeletons ─────────────────────────────────────────────────────────────
 function QuizSkeleton() {
@@ -106,91 +83,20 @@ function GuideSkeleton() {
   );
 }
 
-// ─── Logout Modal ───────────────────────────────────────────────────────────
-function LogoutModal({ onConfirm, onCancel }) {
-  return (
-    <div className="modal-overlay">
-      <div className="modal-box">
-        <div className="modal-icon"><AlertTriangle size={32} color="#f59e0b" /></div>
-        <h2 className="modal-title">¿Cerrar sesión?</h2>
-        <p className="modal-desc">
-          Se eliminarán tu historial, estadísticas y puntos guardados localmente.
-          Esta acción no se puede deshacer.
-        </p>
-        <div className="modal-actions">
-          <button className="btn btn-secondary" onClick={onCancel}>Cancelar</button>
-          <button className="btn btn-danger" onClick={onConfirm}>Sí, cerrar sesión</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Streak Badge ───────────────────────────────────────────────────────────
-function StreakBadge({ streak }) {
-  return (
-    <div className="streak-badge">
-      <div className="streak-badge-icon">⚡</div>
-      <div className="streak-badge-info">
-        <span className="streak-badge-label">Racha</span>
-        <span className="streak-badge-value">{streak} días</span>
-      </div>
-    </div>
-  );
-}
-
-// ─── Rewards Panel ──────────────────────────────────────────────────────────
-function RewardsPanel({ POINTS_BY_DIFFICULTY }) {
-  return (
-    <div className="rewards-card">
-      <div className="rewards-title">
-        <Award size={18} /> Sistema de Recompensas
-      </div>
-      {[
-        { key: 'facil', label: 'Fácil' },
-        { key: 'medio', label: 'Medio' },
-        { key: 'dificil', label: 'Difícil' },
-        { key: 'experto', label: 'Experto' },
-      ].map(d => (
-        <div className="rewards-row" key={d.key}>
-          <span className="rewards-difficulty">{d.label}</span>
-          <span className="rewards-pts">{POINTS_BY_DIFFICULTY[d.key]} pts</span>
-        </div>
-      ))}
-      <p className="rewards-note">* Puntos parciales si aciertas más del 50%. ¡Sigue aprendiendo!</p>
-    </div>
-  );
-}
-
-// ─── Stats Cards Row ────────────────────────────────────────────────────────
-function StatsRow({ dailyStreak, accuracyPercentage, totalQuizzes }) {
-  return (
-    <div className="stats-row">
-      <TiltCard className="stat-card">
-        <span className="stat-emoji">🔥</span>
-        <span className="stat-value">{dailyStreak}</span>
-        <span className="stat-label">Racha de días</span>
-      </TiltCard>
-      <TiltCard className="stat-card">
-        <span className="stat-emoji">🎯</span>
-        <span className="stat-value">{accuracyPercentage}%</span>
-        <span className="stat-label">Aciertos</span>
-      </TiltCard>
-      <TiltCard className="stat-card">
-        <span className="stat-emoji">📚</span>
-        <span className="stat-value">{totalQuizzes}</span>
-        <span className="stat-label">Quizzes</span>
-      </TiltCard>
-    </div>
-  );
-}
-
 // ─── Main App ───────────────────────────────────────────────────────────────
 function App() {
   const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
+  const [showAuth, setShowAuth] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('currentUser');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [screen, setScreen] = useState('input');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [topic, setTopic] = useState('');
   const [difficulty, setDifficulty] = useState('medio');
   const [numQuestions, setNumQuestions] = useState(5);
@@ -208,8 +114,10 @@ function App() {
   const [guide, setGuide] = useState(null);
   const [isGeneratingGuide, setIsGeneratingGuide] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showPointsCelebration, setShowPointsCelebration] = useState(false);
+  const [microConfetti, setMicroConfetti] = useState({ active: false, x: 0, y: 0 });
 
-  const { totalPoints, calculatePoints, addPoints, POINTS_BY_DIFFICULTY } = usePoints();
+  const { totalPoints, calculatePoints, addPoints, resetPoints, POINTS_BY_DIFFICULTY } = usePoints();
 
   const [userStats, setUserStats] = useState(() => {
     const saved = localStorage.getItem('userStats');
@@ -244,11 +152,11 @@ function App() {
       experto: 'Las preguntas deben ser de nivel experto.'
     };
     const prompt = `Genera exactamente ${numQuestions} preguntas de opción múltiple sobre: "${topicInput}".
-NIVEL: ${difficulty.toUpperCase()}
+  NIVEL: ${difficulty.toUpperCase()}
 ${difficultyPrompts[difficulty]}
 Responde ÚNICAMENTE con un array JSON válido:
-[{"question":"...","options":["A","B","C","D"],"correct":0}]
-El campo "correct" es el índice de la respuesta correcta (0-3). En español.`;
+[{ "question": "...", "options": ["A", "B", "C", "D"], "correct": 0 }]
+El campo "correct" es el índice de la respuesta correcta(0 - 3).En español.`;
 
     console.log(`Solicitando quiz sobre: ${topicInput}...`);
 
@@ -262,7 +170,7 @@ El campo "correct" es el índice de la respuesta correcta (0-3). En español.`;
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
         console.error('Error en respuesta API:', err);
-        throw new Error(err.error || `Error ${response.status}`);
+        throw new Error(err.error || `Error ${response.status} `);
       }
 
       const data = await response.json();
@@ -295,16 +203,21 @@ El campo "correct" es el índice de la respuesta correcta (0-3). En español.`;
     setIsGeneratingGuide(true);
     try {
       const prompt = `Crea una guía de estudio detallada en español sobre: "${topicInput}".
-Nivel: ${diff.toUpperCase()}. 
-Incluye: introducción, conceptos clave, ejemplos prácticos, aplicaciones reales, recursos adicionales.
-Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
+  Nivel: ${diff.toUpperCase()}. 
+DEBES usar exactamente estos títulos de sección(puedes añadirles emojis):
+1. INTRODUCCIÓN
+2. CONCEPTOS CLAVE
+3. EJEMPLOS PRÁCTICOS
+4. APLICACIONES REALES
+5. RECURSOS ADICIONALES
+Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdown(# o ##), negritas(** texto **) y viñetas(- o •). ~1000 - 1500 palabras.`;
 
       const response = await fetch(`${getApiUrl()}/api/generate-quiz`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, ...(getApiKey() && { apiKey: getApiKey() }) })
       });
-      if (!response.ok) { const e = await response.json().catch(() => ({})); throw new Error(e.error || `Error ${response.status}`); }
+      if (!response.ok) { const e = await response.json().catch(() => ({})); throw new Error(e.error || `Error ${response.status} `); }
       const data = await response.json();
       const content = data.choices?.[0]?.message?.content ?? data.generated_text ?? '';
       return { topic: topicInput, difficulty: diff, content: content.trim(), createdAt: new Date().toISOString() };
@@ -348,7 +261,7 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
     }
   };
 
-  const handleAnswerSelect = (index) => {
+  const handleAnswerSelect = (index, event) => {
     if (isAnswered) return;
     setSelectedAnswer(index);
     setIsAnswered(true);
@@ -359,6 +272,20 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
       setStreak(streak + 1);
       setShowCelebration(true);
       setTimeout(() => setShowCelebration(false), 1000);
+      
+      // Trigger micro-confetti at button position
+      if (event && event.target) {
+        const rect = event.target.getBoundingClientRect();
+        setMicroConfetti({
+          active: true,
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        });
+        
+        setTimeout(() => {
+          setMicroConfetti({ active: false, x: 0, y: 0 });
+        }, 800);
+      }
     } else {
       setLives(lives - 1);
       setStreak(0);
@@ -377,9 +304,21 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
 
   const handleFinish = () => {
     const correctOnes = userAnswers.filter(a => a.correct).length;
-    const finalEarned = calculatePoints(correctOnes, questions.length, difficulty);
+    const finalEarned = calculatePoints(difficulty, correctOnes, questions.length);
     setEarnedPoints(finalEarned);
-    addPoints(finalEarned, `Quiz: ${topic}`);
+    
+    // Agregar puntos con el formato correcto
+    addPoints(finalEarned, {
+      topic,
+      difficulty,
+      correctAnswers: correctOnes,
+      totalQuestions: questions.length
+    });
+
+    // Mostrar celebración si se ganaron puntos
+    if (finalEarned > 0) {
+      setShowPointsCelebration(true);
+    }
 
     const newStats = {
       ...userStats,
@@ -416,30 +355,34 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('userStats');
-    localStorage.removeItem('quizHistory');
-    localStorage.removeItem('userPoints');
-    localStorage.removeItem('pointsHistory');
-    setUserStats({ dailyStreak: 0, lastQuizDate: null, totalQuizzes: 0, totalCorrectAnswers: 0, totalQuestions: 0 });
-    setQuizHistory([]);
-    setScreen('input');
-    setTopic('');
-    setDifficulty('medio');
-    setNumQuestions(5);
-    setQuestions([]);
-    setScore(0); setLives(3); setStreak(0);
-    setError(''); setUserAnswers([]); setEarnedPoints(0);
-    setGuide(null);
-    setShowLogoutModal(false);
-    setIsLoggedIn(false);
-    localStorage.removeItem('isLoggedIn');
-    window.location.reload();
+  const handleLogin = (user) => {
+    setIsLoggedIn(true);
+    setCurrentUser(user);
+    setShowAuth(false);
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('currentUser', JSON.stringify(user));
   };
 
-  const handleGetStarted = () => {
-    setIsLoggedIn(true);
+  const handleLogout = () => {
+    // Limpiar localStorage (opcionalmente mantener algunas estadísticas locales o borrarlas todas)
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('currentUser');
+
+    // Resetear estados
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setShowAuth(false);
+    setScreen('input');
+    setTopic('');
+    setScore(0);
+    setLives(3);
+    setEarnedPoints(0);
+    setShowLogoutModal(false);
+    // Opcional: Resetear puntos al cerrar sesión
+    // Si quieres mantener puntos entre sesiones, comenta esta línea
+    resetPoints();
   };
+
 
   // ── Render Helpers ───────────────────────────────────────────────────────
   const renderMainContent = () => {
@@ -450,7 +393,7 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
           <div className="skeleton-overlay">
             <div className="loading-card shadow-lg" style={{ width: '400px' }}>
               <div className="loading-spinner"><Loader size={32} className="animate-spin" /></div>
-              <h2 className="loading-title" style={{ fontSize: '1.25rem' }}>Generando Quiz...</h2>
+              <h2 className="loading-title" style={{ fontSize: '1.25rem' }}><AIRevealText text="Generando Quiz..." /></h2>
               <p className="loading-text" style={{ fontSize: '0.9rem' }}>La IA está analizando <strong style={{ color: '#a78bfa' }}>{topic}</strong></p>
             </div>
           </div>
@@ -465,7 +408,7 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
           <div className="skeleton-overlay">
             <div className="loading-card shadow-lg" style={{ width: '400px' }}>
               <div className="loading-spinner"><Loader size={32} className="animate-spin" /></div>
-              <h2 className="loading-title" style={{ fontSize: '1.25rem' }}>Creando Guía...</h2>
+              <h2 className="loading-title" style={{ fontSize: '1.25rem' }}><AIRevealText text="Creando Guía..." /></h2>
               <p className="loading-text" style={{ fontSize: '0.9rem' }}>La IA está estructurando contenido</p>
             </div>
           </div>
@@ -501,7 +444,7 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
               </div>
             </div>
             <div className="quiz-progress-bar">
-              <div className="quiz-progress-fill" style={{ width: `${progress}%` }} />
+              <div className="quiz-progress-fill" style={{ width: `${progress}% ` }} />
             </div>
             <div className="quiz-progress-text">Pregunta {currentQuestion + 1} de {questions.length}</div>
           </div>
@@ -517,7 +460,7 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
                   else if (idx === selectedAnswer) cls += ' quiz-option-incorrect';
                 }
                 return (
-                  <button key={idx} className={cls} onClick={() => handleAnswerSelect(idx)} disabled={isAnswered}>
+                  <button key={idx} className={cls} onClick={(e) => handleAnswerSelect(idx, e)} disabled={isAnswered}>
                     <span>{opt}</span>
                     {isAnswered && idx === q.correct && <CheckCircle size={18} color="#10b981" />}
                     {isAnswered && idx === selectedAnswer && idx !== q.correct && <XCircle size={18} color="#ef4444" />}
@@ -538,7 +481,7 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
             <div className="celebration-overlay">
               <div className="celebration-box">
                 <div className="celebration-emoji">🎉</div>
-                <div className="celebration-text">¡Correcto!</div>
+                <div className="celebration-text"><AIRevealText text="¡Correcto!" scrambleSpeed={30} /></div>
               </div>
             </div>
           )}
@@ -557,7 +500,9 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
               {pct >= 80 ? '🏆' : pct >= 50 ? '🎯' : '💪'}
             </div>
             <div className="results-score-big">{pct}%</div>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Precisión</p>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <AIRevealText text="Precisión Final" delay={300} />
+            </p>
             <div className="results-breakdown">
               <div className="results-item results-item-correct">
                 <div className="results-num">{correctAnswers}</div>
@@ -597,64 +542,18 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
     if (screen === 'stats') {
       return (
         <>
-          <div className="page-header animate-fade-in-up stagger-1">
-            <div>
-              <h1 className="page-title">Tu Progreso</h1>
-              <p className="page-subtitle">Visualiza tu historial de aprendizaje y logros.</p>
-            </div>
-            <StreakBadge streak={safeStats.dailyStreak} />
-          </div>
-          <div className="animate-fade-in-up stagger-2">
+          <AppHeader 
+            title="Tu Progreso"
+            subtitle="Mira cuánto has avanzado hoy"
+            showStreakBadge={true}
+            streakCount={safeStats.dailyStreak}
+          />
+          <div className={ANIMATION_CLASSES.card}>
             <StatsRow dailyStreak={safeStats.dailyStreak} accuracyPercentage={safeStats.accuracyPercentage} totalQuizzes={safeStats.totalQuizzes} />
           </div>
-          <div className="ss-card animate-fade-in-up stagger-3">
+          <div className={`ss-card ${ANIMATION_CLASSES.rewards}`}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>Historial de Actividad</h2>
             <QuizHistory history={quizHistory} />
-          </div>
-        </>
-      );
-    }
-
-    // 7. Input (Modo Quiz)
-    if (screen === 'guide_input') {
-      return (
-        <>
-          <div className="page-header animate-fade-in-up stagger-1">
-            <div>
-              <h1 className="page-title">Guía de Estudio</h1>
-              <p className="page-subtitle">Genera contenido personalizado con IA sobre cualquier tema.</p>
-            </div>
-            <StreakBadge streak={safeStats.dailyStreak} />
-          </div>
-          <div className="mode-layout">
-            <TiltCard className="ss-card animate-fade-in-up stagger-2">
-              {error && <div className="alert alert-error">⚠️ {error}</div>}
-              <div className="form-group">
-                <label className="form-label">¿Sobre qué tema necesitas una guía?</label>
-                <input type="text" className="form-input" value={topic} onChange={e => setTopic(e.target.value)} onKeyPress={e => e.key === 'Enter' && topic.trim() && handleGenerateGuide()} placeholder="Ej: Fotosíntesis, Revolución Francesa, Python..." />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Nivel de conocimiento</label>
-                <div className="select-wrapper">
-                  <select className="form-select" value={difficulty} onChange={e => setDifficulty(e.target.value)}>
-                    <option value="facil">😊 Principiante</option>
-                    <option value="medio">🧠 Intermedio</option>
-                    <option value="dificil">🔥 Avanzado</option>
-                    <option value="experto">💎 Experto</option>
-                  </select>
-                </div>
-              </div>
-              <button className="btn btn-blue btn-shimmer" onClick={handleGenerateGuide} disabled={!topic.trim() || isGeneratingGuide}>
-                <BookOpen size={18} /> {isGeneratingGuide ? 'Generando guía...' : 'Generar Guía de Estudio'}
-              </button>
-            </TiltCard>
-            <TiltCard className="rewards-card animate-fade-in-up stagger-3" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)' }}>
-              <div className="rewards-title"><BookOpen size={18} /> Tu guía incluirá:</div>
-              {['Introducción y contexto', 'Conceptos clave explicados', 'Ejemplos prácticos', 'Aplicaciones en el mundo real', 'Recursos para seguir aprendiendo'].map((item, i) => (
-                <div className="rewards-row" key={i}><span className="rewards-difficulty">{item}</span><span>✓</span></div>
-              ))}
-              <p className="rewards-note">* Guía generada con IA adaptada a tu nivel</p>
-            </TiltCard>
           </div>
         </>
       );
@@ -663,15 +562,14 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
     // Default: Modo Quiz Input
     return (
       <>
-        <div className="page-header animate-fade-in-up stagger-1">
-          <div>
-            <h1 className="page-title">¿Qué vamos a aprender hoy?</h1>
-            <p className="page-subtitle">Configura tu quiz y desafía tus conocimientos con IA.</p>
-          </div>
-          <StreakBadge streak={safeStats.dailyStreak} />
-        </div>
+        <AppHeader 
+          title="¿Qué vamos a aprender hoy?"
+          subtitle="Configura tu quiz y desafía tus conocimientos con IA."
+          showStreakBadge={true}
+          streakCount={safeStats.dailyStreak}
+        />
         <div className="mode-layout">
-          <TiltCard className="ss-card animate-fade-in-up stagger-2">
+          <TiltCard className={`ss-card ${ANIMATION_CLASSES.card}`}>
             {error && <div className="alert alert-error">⚠️ {error}</div>}
             <div className="form-group">
               <label className="form-label">¿Sobre qué tema quieres aprender?</label>
@@ -694,11 +592,9 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
                 <label className="form-label">Preguntas</label>
                 <div className="select-wrapper">
                   <select className="form-select" value={numQuestions} onChange={e => setNumQuestions(Number(e.target.value))}>
-                    <option value="3">3 rápidas</option>
-                    <option value="5">5 estándar</option>
-                    <option value="10">10 completo</option>
-                    <option value="15">15 extenso</option>
-                    <option value="20">20 maratón</option>
+                    {Object.entries(QUIZ_COUNTS).map(([key, label]) => (
+                      <option key={key} value={key}>{label}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -707,7 +603,7 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
               <Sparkles size={18} /> Generar Quiz con IA
             </button>
           </TiltCard>
-          <TiltCard className="animate-fade-in-up stagger-3" style={{ width: '100%', maxWidth: '380px' }}>
+          <TiltCard className={`${ANIMATION_CLASSES.rewards}`} style={{ width: '100%', maxWidth: '380px' }}>
             <RewardsPanel POINTS_BY_DIFFICULTY={POINTS_BY_DIFFICULTY} />
           </TiltCard>
         </div>
@@ -717,18 +613,27 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
 
   useEffect(() => {
     const handleMouseMove = (e) => {
-      document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-      document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+      document.documentElement.style.setProperty('--mouse-x', `${e.clientX} px`);
+      document.documentElement.style.setProperty('--mouse-y', `${e.clientY} px`);
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn && !showAuth) {
     return (
       <>
         <div className="mouse-glow" />
-        <LandingPage onGetStarted={handleGetStarted} />
+        <LandingPage onGetStarted={() => setShowAuth(true)} />
+      </>
+    );
+  }
+
+  if (showAuth) {
+    return (
+      <>
+        <div className="mouse-glow" />
+        <AuthWrapper onLogin={handleLogin} onBack={() => setShowAuth(false)} />
       </>
     );
   }
@@ -741,6 +646,20 @@ Usa títulos en negrita, viñetas y lenguaje claro. ~1000-1500 palabras.`;
         {renderMainContent()}
       </main>
       {showLogoutModal && <LogoutModal onConfirm={handleLogout} onCancel={() => setShowLogoutModal(false)} />}
+      {showPointsCelebration && (
+        <PointsCelebration 
+          points={earnedPoints} 
+          isVisible={showPointsCelebration}
+          onComplete={() => setShowPointsCelebration(false)}
+        />
+      )}
+      {microConfetti.active && (
+        <MicroConfetti 
+          isActive={microConfetti.active}
+          x={microConfetti.x}
+          y={microConfetti.y}
+        />
+      )}
     </div>
   );
 }

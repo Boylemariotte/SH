@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FileText, BookOpen, Sparkles, ArrowLeft, AlertCircle, CheckCircle, Award, Loader } from 'lucide-react';
 import FileUpload from './FileUpload';
 import TiltCard from './TiltCard';
+import AIRevealText from './AIRevealText';
 import { useFileProcessor } from '../hooks/useFileProcessor';
 import '../styles/FileUpload.css';
 
@@ -221,7 +222,7 @@ const StudyFromFile = ({
           <button className="btn-back" onClick={onBack}>
             <ArrowLeft size={16} /> Volver al menú
           </button>
-          <h1 className="page-title">Estudiar desde Archivo</h1>
+          <h1 className="page-title"><AIRevealText text="Estudiar desde Archivo" /></h1>
           <p className="page-subtitle">Sube un documento y deja que la IA cree materiales de estudio para ti.</p>
         </div>
       </div>

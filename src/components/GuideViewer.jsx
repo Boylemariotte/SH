@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, ArrowLeft, ChevronDown, ChevronUp, Book, Link as LinkIcon } from 'lucide-react';
+import ArchiveResources from './ArchiveResources';
 import '../styles/guideStyles.css';
 
 const GuideViewer = ({ guide, onBack }) => {
   const [expandedSections, setExpandedSections] = useState({});
-  
+
   // Inicializar todas las secciones como expandidas
   useEffect(() => {
     const sections = {
@@ -13,11 +14,12 @@ const GuideViewer = ({ guide, onBack }) => {
       ejemplos: true,
       aplicaciones: true,
       preguntas: true,
-      bibliografia: true
+      bibliografia: true,
+      archive: true
     };
     setExpandedSections(sections);
   }, [guide]);
-  
+
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
       ...prev,
@@ -28,7 +30,7 @@ const GuideViewer = ({ guide, onBack }) => {
   // Función para formatear el texto con saltos de línea
   const formatGuideText = (text) => {
     if (!text) return [];
-    
+
     // Dividir por secciones principales
     const sections = {
       introduccion: '',
@@ -37,43 +39,39 @@ const GuideViewer = ({ guide, onBack }) => {
       aplicaciones: '',
       recursos: ''
     };
-    
-    let currentSection = null;
-    
+
+    let currentSection = 'introduccion';
+
     text.split('\n').forEach(line => {
-      const trimmedLine = line.trim();
-      
-      // Identificar secciones principales
-      if (trimmedLine.toLowerCase().includes('introducción') || 
-          trimmedLine.toLowerCase().includes('introduccion')) {
+      const trimmed = line.trim();
+      const lower = trimmed.toLowerCase();
+
+      // Detectar cambios de sección solo si la línea parece un encabezado (Markdown o Etiqueta)
+      // Buscamos líneas que empiecen con #, ## o números seguidos del nombre de la sección
+      const isHeader = trimmed.startsWith('#') || /^\d+\./.test(trimmed);
+
+      if (isHeader && (lower.includes('introducción') || lower.includes('introduccion'))) {
         currentSection = 'introduccion';
-        sections[currentSection] += line + '\n';
-      } else if (trimmedLine.toLowerCase().includes('conceptos clave')) {
+      } else if (isHeader && (lower.includes('conceptos clave') || lower.includes('conceptos fundamentales'))) {
         currentSection = 'conceptos';
-        sections[currentSection] += line + '\n';
-      } else if (trimmedLine.toLowerCase().includes('ejemplos prácticos') || 
-                 trimmedLine.toLowerCase().includes('ejemplos practicos')) {
+      } else if (isHeader && (lower.includes('ejemplos prácticos') || lower.includes('ejemplos practicos'))) {
         currentSection = 'ejemplos';
-        sections[currentSection] += line + '\n';
-      } else if (trimmedLine.toLowerCase().includes('aplicaciones') || 
-                 trimmedLine.toLowerCase().includes('aplicación')) {
+      } else if (isHeader && (lower.includes('aplicaciones') || lower.includes('aplicación') || lower.includes('vida real'))) {
         currentSection = 'aplicaciones';
-        sections[currentSection] += line + '\n';
-      } else if (trimmedLine.toLowerCase().includes('recursos') || 
-                 trimmedLine.toLowerCase().includes('bibliografía') ||
-                 trimmedLine.toLowerCase().includes('bibliografia')) {
+      } else if (isHeader && (lower.includes('recursos') || lower.includes('bibliograf') || lower.includes('glosario'))) {
         currentSection = 'recursos';
-        sections[currentSection] += line + '\n';
-      } else if (currentSection) {
+      }
+
+      if (currentSection) {
         sections[currentSection] += line + '\n';
       }
     });
-    
+
     // Generar preguntas clave basadas en el contenido
     const generateKeyQuestions = () => {
       const questions = [];
       const content = text.toLowerCase();
-      
+
       if (content.includes('definición') || content.includes('definicion')) {
         questions.push(`¿Cuál es la definición precisa de ${guide.topic}?`);
       }
@@ -89,20 +87,20 @@ const GuideViewer = ({ guide, onBack }) => {
       if (content.includes('historia') || content.includes('origen')) {
         questions.push(`¿Cuál es el origen o historia de ${guide.topic}?`);
       }
-      
+
       // Asegurarse de tener al menos 3 preguntas
       while (questions.length < 3) {
         questions.push(`¿Cuáles son los aspectos más relevantes de ${guide.topic}?`);
       }
-      
+
       return questions;
     };
-    
+
     // Generar bibliografía específica según el tema
     const generateBibliography = () => {
       const topic = guide.topic.toLowerCase();
       const bibliografia = [];
-      
+
       // Mapeo de temas a recursos específicos
       const topicResources = {
         // Matemáticas
@@ -133,7 +131,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'geometría': 'matemática',
         'estadística': 'matemática',
         'trigonometría': 'matemática',
-        
+
         // Programación
         'programación': [
           {
@@ -163,7 +161,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'java': 'programación',
         'web development': 'programación',
         'desarrollo web': 'programación',
-        
+
         // Ciencias de la computación
         'algoritmo': [
           {
@@ -183,7 +181,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'estructura de datos': 'algoritmo',
         'ciencias de la computación': 'algoritmo',
         'computer science': 'algoritmo',
-        
+
         // Historia
         'historia': [
           {
@@ -208,7 +206,7 @@ const GuideViewer = ({ guide, onBack }) => {
         ],
         'historia universal': 'historia',
         'historia del mundo': 'historia',
-        
+
         // Ciencia
         'ciencia': [
           {
@@ -236,7 +234,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'biología': 'ciencia',
         'astronomía': 'ciencia',
         'geología': 'ciencia',
-        
+
         // Negocios y economía
         'economía': [
           {
@@ -257,7 +255,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'finanzas': 'economía',
         'negocios': 'economía',
         'emprendimiento': 'economía',
-        
+
         // Psicología
         'psicología': [
           {
@@ -277,7 +275,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'psicologia': 'psicología',
         'mente': 'psicología',
         'comportamiento': 'psicología',
-        
+
         // Idiomas
         'inglés': [
           {
@@ -303,12 +301,11 @@ const GuideViewer = ({ guide, onBack }) => {
         ],
         'ingles': 'inglés',
         'francés': 'inglés',
-        'francés': 'inglés',
         'alemán': 'inglés',
         'italiano': 'inglés',
         'portugués': 'inglés',
         'español': 'inglés',
-        
+
         // Medicina
         'medicina': [
           {
@@ -335,7 +332,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'anatomía': 'medicina',
         'fisiología': 'medicina',
         'enfermería': 'medicina',
-        
+
         // Derecho
         'derecho': [
           {
@@ -355,8 +352,8 @@ const GuideViewer = ({ guide, onBack }) => {
         'leyes': 'derecho',
         'constitucional': 'derecho',
         'penal': 'derecho',
-        'civil': 'derecho',
-        
+        'civil_derecho': 'derecho',
+
         // Ingeniería
         'ingeniería': [
           {
@@ -380,7 +377,7 @@ const GuideViewer = ({ guide, onBack }) => {
         'industrial': 'ingeniería',
         'sistemas': 'ingeniería',
         'informática': 'ingeniería',
-        
+
         // Arte y diseño
         'arte': [
           {
@@ -412,10 +409,10 @@ const GuideViewer = ({ guide, onBack }) => {
         'gráfico': 'arte',
         'grafico': 'arte'
       };
-      
+
       // Buscar recursos específicos para el tema
       let recursosEspecificos = [];
-      
+
       // Primero buscamos coincidencias exactas
       for (const [key, value] of Object.entries(topicResources)) {
         if (topic.includes(key)) {
@@ -428,12 +425,12 @@ const GuideViewer = ({ guide, onBack }) => {
           }
         }
       }
-      
+
       // Si no encontramos recursos específicos, usamos una búsqueda más amplia
       if (recursosEspecificos.length === 0) {
         // Dividimos el tema en palabras clave
         const palabrasClave = topic.split(/\s+/);
-        
+
         // Buscamos cada palabra clave en los recursos
         for (const palabra of palabrasClave) {
           if (palabra.length > 3) { // Ignorar palabras muy cortas
@@ -449,7 +446,7 @@ const GuideViewer = ({ guide, onBack }) => {
           }
         }
       }
-      
+
       // Si aún no hay recursos específicos, usamos recursos generales
       if (recursosEspecificos.length === 0) {
         recursosEspecificos = [
@@ -523,55 +520,102 @@ const GuideViewer = ({ guide, onBack }) => {
           }
         ];
       }
-      
+
       // Limitar a 10 recursos como máximo
       return recursosEspecificos.slice(0, 10);
     };
-    
+
     const keyQuestions = generateKeyQuestions();
     const bibliography = generateBibliography();
-    
+
     // Función para renderizar el contenido de una sección
     const renderSectionContent = (content) => {
       if (!content) return null;
-      
+
       return content
         .split('\n')
         .filter(line => line.trim() !== '')
         .map((line, index) => {
-          // Títulos de sección
-          if (line.trim().match(/^[A-ZÁÉÍÓÚÑ][^:]+:$/)) {
-            return <h3 key={index} className="guide-section-title">{line}</h3>;
+          const trimmed = line.trim();
+
+          // Saltar líneas que son solo etiquetas de sección redundantes
+          // Removemos emojis, números de lista y puntuación para comparar
+          const cleanText = trimmed.replace(/[^\w\sÁÉÍÓÚÑáéíóúñ]/g, '').toLowerCase().trim();
+          const targetKeywords = [
+            'introducción', 'introduccion',
+            'conceptos clave', 'conceptos fundamentales',
+            'ejemplos prácticos', 'ejemplos practicos',
+            'aplicaciones reales', 'aplicaciones',
+            'recursos adicionales', 'bibliografia', 'bibliografía',
+            'glosario'
+          ];
+
+          if (targetKeywords.some(kw => cleanText === kw || cleanText.endsWith(kw))) {
+            return null;
           }
-          // Subtítulos
-          else if (line.trim().startsWith('## ')) {
-            return <h4 key={index} className="guide-subsection-title">{line.substring(3)}</h4>;
+
+          // Títulos de sección (ej. "CONTENIDO:")
+          if (trimmed.match(/^[A-ZÁÉÍÓÚÑ\s]{3,}:$/)) {
+            return <h3 key={index} className="guide-section-title">{trimmed}</h3>;
           }
-          // Listas numeradas
-          else if (/^\d+\.\s/.test(line.trim())) {
-            return <p key={index} className="guide-list-item">{line}</p>;
+
+          // Procesar negritas inter-linea (**texto**)
+          const processBold = (text) => {
+            if (!text) return "";
+            const parts = text.split(/(\*\*.*?\*\*)/g);
+            return parts.map((part, i) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                return <strong key={i} className="guide-bold">{part.slice(2, -2)}</strong>;
+              }
+              return part;
+            });
+          };
+
+          // Soporte para Markdown Headers (#, ##, ###)
+          if (trimmed.startsWith('### ')) {
+            return <h5 key={index} className="guide-h3">{processBold(trimmed.substring(4))}</h5>;
           }
-          // Listas con viñetas
-          else if (line.trim().startsWith('- ')) {
-            return <p key={index} className="guide-bullet-item">• {line.substring(2)}</p>;
+          if (trimmed.startsWith('## ')) {
+            return <h4 key={index} className="guide-h2">{processBold(trimmed.substring(3))}</h4>;
           }
-          // Texto en negrita
-          else if (line.trim().startsWith('**') && line.trim().endsWith('**')) {
-            return <p key={index} className="guide-important">{line.replace(/\*\*/g, '')}</p>;
+          if (trimmed.startsWith('# ')) {
+            return <h3 key={index} className="guide-h1">{processBold(trimmed.substring(2))}</h3>;
           }
-          // Párrafos normales
-          return <p key={index} className="guide-paragraph">{line}</p>;
+
+          // Listas numeradas (1. algo)
+          if (/^\d+\.\s/.test(trimmed)) {
+            const dotIdx = trimmed.indexOf('.');
+            return (
+              <div key={index} className="guide-list-item-wrapper">
+                <span className="guide-list-num">{trimmed.substring(0, dotIdx + 1)}</span>
+                <p className="guide-list-item">{processBold(trimmed.substring(dotIdx + 1).trim())}</p>
+              </div>
+            );
+          }
+
+          // Listas con viñetas (- algo, * algo, o • algo)
+          if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('•')) {
+            const content = trimmed.startsWith('•') ? trimmed.substring(1).trim() : trimmed.substring(2);
+            return (
+              <p key={index} className="guide-bullet-item">
+                <span className="bullet-dot">•</span> {processBold(content)}
+              </p>
+            );
+          }
+
+          // Párrafos normales con soporte para negritas
+          return <p key={index} className="guide-paragraph">{processBold(trimmed)}</p>;
         });
     };
-    
+
     return (
       <>
         {/* Columna izquierda - Contenido principal */}
         <div className="guide-main-column">
           {/* Sección de Introducción */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('introduccion')}
             >
               <h2>📖 Introducción</h2>
@@ -587,11 +631,11 @@ const GuideViewer = ({ guide, onBack }) => {
               </div>
             )}
           </div>
-          
+
           {/* Sección de Conceptos Clave */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('conceptos')}
             >
               <h2>🔑 Conceptos Clave</h2>
@@ -607,11 +651,11 @@ const GuideViewer = ({ guide, onBack }) => {
               </div>
             )}
           </div>
-          
+
           {/* Sección de Ejemplos */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('ejemplos')}
             >
               <h2>📝 Ejemplos Prácticos</h2>
@@ -627,11 +671,11 @@ const GuideViewer = ({ guide, onBack }) => {
               </div>
             )}
           </div>
-          
+
           {/* Sección de Aplicaciones */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('aplicaciones')}
             >
               <h2>🌍 Aplicaciones</h2>
@@ -648,13 +692,13 @@ const GuideViewer = ({ guide, onBack }) => {
             )}
           </div>
         </div>
-        
+
         {/* Columna derecha - Recursos y preguntas */}
         <div className="guide-sidebar-column">
           {/* Preguntas Clave */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('preguntas')}
             >
               <h2>❓ Preguntas Clave</h2>
@@ -679,11 +723,11 @@ const GuideViewer = ({ guide, onBack }) => {
               </div>
             )}
           </div>
-          
+
           {/* Bibliografía */}
           <div className="guide-section">
-            <div 
-              className="guide-section-header" 
+            <div
+              className="guide-section-header"
               onClick={() => toggleSection('bibliografia')}
             >
               <h2>📚 Recursos</h2>
@@ -707,14 +751,14 @@ const GuideViewer = ({ guide, onBack }) => {
                       </div>
                     ))}
                   </div>
-                  
+
                   <h3>En línea:</h3>
                   <div className="online-resources">
                     {bibliography.filter(item => !item.type.includes('Libro')).map((item, index) => (
-                      <a 
-                        key={index} 
-                        href={item.url} 
-                        target="_blank" 
+                      <a
+                        key={index}
+                        href={item.url}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="resource-link"
                       >
@@ -727,11 +771,27 @@ const GuideViewer = ({ guide, onBack }) => {
                       </a>
                     ))}
                   </div>
-                  
+
                   <div className="citation-note">
                     <p>📌 Cita estos recursos en trabajos académicos</p>
                   </div>
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* Internet Archive Resources */}
+          <div className="guide-section">
+            <div
+              className="guide-section-header"
+              onClick={() => toggleSection('archive')}
+            >
+              <h2>🌐 Recursos de Archive.org</h2>
+              {expandedSections.archive ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            </div>
+            {expandedSections.archive && (
+              <div className="guide-section-content">
+                <ArchiveResources topic={guide.topic} />
               </div>
             )}
           </div>
@@ -742,7 +802,7 @@ const GuideViewer = ({ guide, onBack }) => {
 
   return (
     <div className="guide-container">
-      <button 
+      <button
         onClick={onBack}
         className="back-button"
         aria-label="Volver al menú principal"
@@ -750,7 +810,7 @@ const GuideViewer = ({ guide, onBack }) => {
         <ArrowLeft size={20} style={{ marginRight: '8px' }} />
         Volver al menú
       </button>
-      
+
       <div className="guide-header">
         <div className="guide-icon">
           <BookOpen size={40} />
@@ -771,7 +831,7 @@ const GuideViewer = ({ guide, onBack }) => {
           </div>
         </div>
       </div>
-      
+
       <div className="guide-content">
         {guide.content ? (
           <div className="guide-text">
@@ -784,9 +844,9 @@ const GuideViewer = ({ guide, onBack }) => {
           </div>
         )}
       </div>
-      
+
       <div className="guide-actions">
-        <button 
+        <button
           onClick={() => window.print()}
           className="print-button"
         >
@@ -797,10 +857,10 @@ const GuideViewer = ({ guide, onBack }) => {
           </svg>
           Imprimir guía
         </button>
-        <button 
+        <button
           onClick={() => {
             const element = document.createElement('a');
-            const file = new Blob([document.querySelector('.guide-content').innerText], {type: 'text/plain'});
+            const file = new Blob([document.querySelector('.guide-content').innerText], { type: 'text/plain' });
             element.href = URL.createObjectURL(file);
             element.download = `Guia-de-Estudio-${guide.topic.replace(/\s+/g, '-')}.txt`;
             document.body.appendChild(element);
@@ -817,9 +877,9 @@ const GuideViewer = ({ guide, onBack }) => {
           Descargar como TXT
         </button>
       </div>
-      
+
       <div className="guide-footer">
-        <p>© {new Date().getFullYear()} Study Helper con IA - Herramienta educativa</p>
+        <p>© {new Date().getFullYear()} StudyHelper AI - Herramienta educativa con IA</p>
       </div>
     </div>
   );

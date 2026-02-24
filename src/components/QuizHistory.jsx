@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, CheckCircle, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, ChevronDown, ChevronUp, Award, Target, TrendingUp } from 'lucide-react';
 import '../styles/quizHistory.css';
 
 const QuizHistory = ({ history }) => {
@@ -19,17 +19,49 @@ const QuizHistory = ({ history }) => {
     });
   };
 
+  const getDifficultyColor = (difficulty) => {
+    const colors = {
+      facil: '#10b981',
+      medio: '#f59e0b', 
+      dificil: '#ef4444',
+      experto: '#a855f7'
+    };
+    return colors[difficulty] || '#6b7280';
+  };
+
+  const getScoreEmoji = (score) => {
+    if (score >= 90) return '🏆';
+    if (score >= 70) return '🎯';
+    if (score >= 50) return '💪';
+    return '📚';
+  };
+
   if (!history || history.length === 0) {
     return (
       <div className="no-history">
-        <p>No hay historial de quizzes aún.</p>
+        <div className="no-history-icon">📊</div>
+        <h3>No hay historial de quizzes</h3>
+        <p>Completa tu primer quiz para ver tu progreso aquí</p>
       </div>
     );
   }
 
   return (
     <div className="quiz-history">
-      <h3>Historial de Quizzes</h3>
+      <div className="history-header">
+        <h3>Historial de Quizzes</h3>
+        <div className="history-stats">
+          <div className="stat-item">
+            <Target size={16} />
+            <span>{history.length} quizzes</span>
+          </div>
+          <div className="stat-item">
+            <TrendingUp size={16} />
+            <span>{Math.round(history.reduce((acc, q) => acc + q.score, 0) / history.length)}% promedio</span>
+          </div>
+        </div>
+      </div>
+      
       <div className="history-list">
         {history.map((quiz, index) => (
           <div key={index} className="quiz-card">
@@ -37,46 +69,78 @@ const QuizHistory = ({ history }) => {
               className="quiz-summary" 
               onClick={() => toggleExpand(index)}
             >
-              <div className="quiz-header">
-                <span className="quiz-date">
-                  <Clock size={16} /> {formatDate(quiz.timestamp)}
-                </span>
-                <span className={`quiz-score ${quiz.score >= 70 ? 'high-score' : 'low-score'}`}>
-                  {quiz.score}%
-                </span>
-                {expandedIndex === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+              <div className="quiz-main-info">
+                <div className="quiz-title-row">
+                  <div className="quiz-topic">
+                    <span className="topic-emoji">{getScoreEmoji(quiz.score)}</span>
+                    <span className="topic-text">{quiz.topic || 'Quiz'}</span>
+                  </div>
+                  <div 
+                    className="difficulty-badge"
+                    style={{ backgroundColor: getDifficultyColor(quiz.difficulty) }}
+                  >
+                    {quiz.difficulty}
+                  </div>
+                </div>
+                
+                <div className="quiz-meta">
+                  <span className="quiz-date">
+                    <Clock size={14} />
+                    {formatDate(quiz.timestamp || quiz.date)}
+                  </span>
+                  <div className="quiz-score-info">
+                    <span className={`quiz-score ${quiz.score >= 70 ? 'high-score' : 'low-score'}`}>
+                      {quiz.score}%
+                    </span>
+                    <span className="quiz-accuracy">
+                      {quiz.correctAnswers || quiz.score}/{quiz.totalQuestions || 5}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="quiz-stats">
-                {quiz.correctAnswers} de {quiz.totalQuestions} respuestas correctas
+              
+              <div className="quiz-points-row">
+                {quiz.points && (
+                  <div className="points-earned">
+                    <Award size={14} />
+                    <span>+{quiz.points} pts</span>
+                  </div>
+                )}
+                <div className="expand-icon">
+                  {expandedIndex === index ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                </div>
               </div>
             </div>
             
             {expandedIndex === index && (
               <div className="quiz-details">
-                <h4>Detalles del Quiz</h4>
-                <div className="questions-list">
-                  {quiz.questions.map((q, qIndex) => (
-                    <div key={qIndex} className="question-item">
-                      <p className="question-text">{q.question}</p>
-                      <div className="answer user-answer">
-                        <span>Tu respuesta:</span>
-                        <span className={q.userAnswer === q.correctAnswer ? 'correct' : 'incorrect'}>
-                          {q.userAnswer}
-                          {q.userAnswer === q.correctAnswer ? (
-                            <CheckCircle size={16} className="icon" />
-                          ) : (
-                            <XCircle size={16} className="icon" />
-                          )}
-                        </span>
-                      </div>
-                      {q.userAnswer !== q.correctAnswer && (
-                        <div className="answer correct-answer">
-                          <span>Respuesta correcta:</span>
-                          <span>{q.correctAnswer}</span>
-                        </div>
-                      )}
+                <div className="details-header">
+                  <h4>Detalles del Quiz</h4>
+                  <div className="details-stats">
+                    <div className="detail-stat">
+                      <span className="stat-label">Puntuación</span>
+                      <span className="stat-value">{quiz.score}%</span>
                     </div>
-                  ))}
+                    <div className="detail-stat">
+                      <span className="stat-label">Correctas</span>
+                      <span className="stat-value">{quiz.correctAnswers || quiz.score}/{quiz.totalQuestions || 5}</span>
+                    </div>
+                    {quiz.points && (
+                      <div className="detail-stat">
+                        <span className="stat-label">Puntos</span>
+                        <span className="stat-value">+{quiz.points}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="questions-preview">
+                  <p className="preview-text">
+                    {quiz.questions ? 
+                      `Revisa las ${quiz.questions.length} preguntas de este quiz` : 
+                      'Quiz completado con éxito'
+                    }
+                  </p>
                 </div>
               </div>
             )}

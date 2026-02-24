@@ -18,7 +18,7 @@ const QuizInput = ({
           <div className="duo-avatar duo-avatar-purple">
             <Sparkles className="duo-avatar-icon" />
           </div>
-          <h1 className="duo-title">Study Helper</h1>
+          <h1 className="duo-title">StudyHelper AI</h1>
           <p className="duo-subtitle">Aprende Estudiando con IA</p>
         </div>
         
