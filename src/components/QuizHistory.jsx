@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Clock, CheckCircle, XCircle, ChevronDown, ChevronUp, Award, Target, TrendingUp } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, ChevronDown, ChevronUp, Award, Target, TrendingUp, RotateCcw } from 'lucide-react';
 import '../styles/quizHistory.css';
 
-const QuizHistory = ({ history }) => {
+const QuizHistory = ({ history, onRetryQuiz }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const toggleExpand = (index) => {
@@ -134,14 +134,61 @@ const QuizHistory = ({ history }) => {
                   </div>
                 </div>
                 
-                <div className="questions-preview">
-                  <p className="preview-text">
-                    {quiz.questions ? 
-                      `Revisa las ${quiz.questions.length} preguntas de este quiz` : 
-                      'Quiz completado con éxito'
-                    }
-                  </p>
-                </div>
+                {quiz.questions && quiz.userAnswers && (
+                  <div className="questions-review">
+                    <h5>Revisión de Respuestas</h5>
+                    {quiz.questions.map((question, qIndex) => {
+                      const userAnswer = quiz.userAnswers.find(a => a.questionIndex === qIndex);
+                      const isCorrect = userAnswer?.correct || false;
+                      
+                      return (
+                        <div key={qIndex} className={`question-review ${isCorrect ? 'correct' : 'incorrect'}`}>
+                          <div className="question-header">
+                            <span className="question-number">Pregunta {qIndex + 1}</span>
+                            <span className={`answer-status ${isCorrect ? 'status-correct' : 'status-incorrect'}`}>
+                              {isCorrect ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                              {isCorrect ? 'Correcta' : 'Incorrecta'}
+                            </span>
+                          </div>
+                          
+                          <div className="question-text">{question.question}</div>
+                          
+                          <div className="answers-grid">
+                            {question.options.map((option, oIndex) => {
+                              const isUserAnswer = userAnswer?.answer === oIndex;
+                              const isCorrectAnswer = question.correct === oIndex;
+                              
+                              let className = 'answer-option';
+                              if (isCorrectAnswer) className += ' correct-answer';
+                              if (isUserAnswer && !isCorrect) className += ' user-wrong-answer';
+                              
+                              return (
+                                <div key={oIndex} className={className}>
+                                  <span className="option-label">{String.fromCharCode(65 + oIndex)}</span>
+                                  <span className="option-text">{option}</span>
+                                  {isCorrectAnswer && <CheckCircle size={14} className="correct-icon" />}
+                                  {isUserAnswer && !isCorrect && <XCircle size={14} className="wrong-icon" />}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                
+                {onRetryQuiz && quiz.questions && (
+                  <div className="retry-section">
+                    <button 
+                      className="btn btn-primary retry-btn"
+                      onClick={() => onRetryQuiz(quiz)}
+                    >
+                      <RotateCcw size={16} style={{ marginRight: '8px' }} />
+                      Reintentar Quiz
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>

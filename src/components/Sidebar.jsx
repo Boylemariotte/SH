@@ -21,6 +21,7 @@ function Sidebar({ screen, onNavigate, totalPoints, onLogout }) {
           { id: 'input', label: 'Modo Quiz', icon: '⚡' },
           { id: 'guide_input', label: 'Guía de Estudio', icon: '📚' },
           { id: 'study_from_file', label: 'Subir Archivo', icon: '📄' },
+          { id: 'history', label: 'Historial', icon: '📋' },
           { id: 'stats', label: 'Estadísticas', icon: '📊' },
         ].map(item => (
           <button

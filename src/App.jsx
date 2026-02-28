@@ -17,6 +17,7 @@ import MicroConfetti from './components/MicroConfetti';
 import { APP_CONFIG, ANIMATION_CLASSES, DIFFICULTY_LABELS, QUIZ_COUNTS } from './constants/appConfig';
 import AIRevealText from './components/AIRevealText';
 import GuideViewer from './components/GuideViewer';
+import GuideInput from './components/GuideInput';
 import { usePoints } from './hooks/usePoints';
 import './styles/guideStyles.css';
 import './styles/quizHistory.css';
@@ -332,7 +333,9 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
 
     const historyItem = {
       topic, difficulty, score: correctOnes, total: questions.length,
-      date: new Date().toISOString(), points: finalEarned
+      date: new Date().toISOString(), points: finalEarned,
+      questions: questions,
+      userAnswers: userAnswers
     };
     const newHistory = [historyItem, ...quizHistory].slice(0, 50);
     setQuizHistory(newHistory);
@@ -348,9 +351,26 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
     setError(''); setUserAnswers([]); setEarnedPoints(0);
   };
 
+  const handleRetryQuiz = (quiz) => {
+    setQuestions(quiz.questions);
+    setUserAnswers([]);
+    setTopic(quiz.topic);
+    setDifficulty(quiz.difficulty);
+    setNumQuestions(quiz.questions.length);
+    setCurrentQuestion(0);
+    setSelectedAnswer(null);
+    setIsAnswered(false);
+    setScore(0);
+    setLives(3);
+    setStreak(0);
+    setError('');
+    setEarnedPoints(0);
+    setScreen('quiz');
+  };
+
   const handleNavigate = (id) => {
     setError('');
-    if (id === 'input' || id === 'guide_input' || id === 'stats' || id === 'study_from_file') {
+    if (id === 'input' || id === 'guide_input' || id === 'stats' || id === 'study_from_file' || id === 'history') {
       setScreen(id);
     }
   };
@@ -420,6 +440,21 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
     // 2. Guide
     if (screen === 'guide' && guide) {
       return <GuideViewer guide={guide} onBack={() => setScreen('guide_input')} />;
+    }
+
+    // 2.1. Guide Input
+    if (screen === 'guide_input') {
+      return (
+        <GuideInput
+          topic={topic}
+          setTopic={setTopic}
+          difficulty={difficulty}
+          setDifficulty={setDifficulty}
+          onGenerateGuide={() => handleGenerateGuide()}
+          error={error}
+          isGenerating={isGeneratingGuide}
+        />
+      );
     }
 
     // 3. Quiz
@@ -538,7 +573,23 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
       );
     }
 
-    // 6. Stats
+    // 6. History
+    if (screen === 'history') {
+      return (
+        <>
+          <AppHeader 
+            title="Historial de Quizzes"
+            subtitle="Revisa tus quizzes anteriores y reintenta los que quieras"
+            showStreakBadge={false}
+          />
+          <div className={`ss-card ${ANIMATION_CLASSES.card}`}>
+            <QuizHistory history={quizHistory} onRetryQuiz={handleRetryQuiz} />
+          </div>
+        </>
+      );
+    }
+
+    // 7. Stats
     if (screen === 'stats') {
       return (
         <>
@@ -553,7 +604,7 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
           </div>
           <div className={`ss-card ${ANIMATION_CLASSES.rewards}`}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>Historial de Actividad</h2>
-            <QuizHistory history={quizHistory} />
+            <QuizHistory history={quizHistory} onRetryQuiz={handleRetryQuiz} />
           </div>
         </>
       );
