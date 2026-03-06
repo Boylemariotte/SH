@@ -213,31 +213,31 @@
 
 .guide-section-header {
   padding: 1rem 1.25rem;
-  background: linear-gradient(to right, #f9fafb 0%, #ffffff 100%);
+  background: linear-gradient(to right, #f8fafc 0%, #f1f5f9 100%);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: all 0.2s ease;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .guide-section-header:hover {
-  background: linear-gradient(to right, #f3f4f6 0%, #f9fafb 100%);
+  background: linear-gradient(to right, #f1f5f9 0%, #e2e8f0 100%);
 }
 
 .guide-section-header h2 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111827;
+  color: #0f172a;
   display: flex;
   align-items: center;
   gap: 0.6rem;
 }
 
 .guide-section-header svg {
-  color: #6b7280;
+  color: #475569;
   transition: transform 0.2s ease;
 }
 
@@ -387,8 +387,9 @@
 
 .key-questions p {
   margin-top: 0;
-  color: #4b5563;
+  color: #1f2937;
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .key-questions ul {
@@ -402,17 +403,19 @@
   padding: 0.75rem 1rem;
   margin-bottom: 0.6rem;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e2e8f0;
   display: flex;
   gap: 0.6rem;
   transition: all 0.2s ease;
   font-size: 1rem;
+  color: #0f172a;
 }
 
 .key-question:hover {
   background: #f1f5f9;
   border-color: #cbd5e1;
   transform: translateX(3px);
+  color: #0f172a;
 }
 
 .question-number {

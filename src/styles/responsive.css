@@ -765,13 +765,13 @@
   .main-content {
     margin-left: 0;
     padding: 1rem;
-    padding-top: 2rem; /* Más espacio para evitar el navbar */
+    padding-top: 3.5rem; /* Más espacio para evitar completamente el navbar */
   }
   
   /* Page Headers responsive */
   .page-header {
     margin-bottom: 2rem;
-    margin-top: 0.5rem;
+    margin-top: 1rem; /* Más separación del navbar */
   }
   
   .page-title {
@@ -862,13 +862,13 @@
   
   .main-content {
     padding: 0.75rem;
-    padding-top: 1.5rem; /* Más espacio para evitar el navbar */
+    padding-top: 3rem; /* Más espacio para evitar completamente el navbar */
   }
   
   /* Page Headers responsive */
   .page-header {
     margin-bottom: 1.5rem;
-    margin-top: 0.5rem;
+    margin-top: 1rem; /* Más separación del navbar */
   }
   
   .page-title {
