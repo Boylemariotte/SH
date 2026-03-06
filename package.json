@@ -8,6 +8,7 @@
     "dev:vercel": "concurrently \"npm run dev\" \"node dev-server.js\"",
     "server": "node server/index.js",
     "build": "vite build",
+    "build:prod": "npm ci && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "vite preview"
