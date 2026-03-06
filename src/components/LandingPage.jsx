@@ -1,8 +1,11 @@
-import { Sparkles, ArrowRight, BookOpen, Zap, Trophy, Shield } from 'lucide-react';
+import { Sparkles, ArrowRight, BookOpen, Zap, Trophy, Shield, Menu, X } from 'lucide-react';
 import TiltCard from './TiltCard';
 import AIRevealText from './AIRevealText';
+import { useState } from 'react';
 
 const LandingPage = ({ onGetStarted }) => {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     return (
         <div className="landing-container">
             {/* Background Effects */}
@@ -15,6 +18,8 @@ const LandingPage = ({ onGetStarted }) => {
                     <Sparkles className="logo-icon" />
                     <span>StudyHelper AI</span>
                 </div>
+                
+                {/* Desktop Navigation */}
                 <div className="landing-nav-links">
                     <a href="#features">Características</a>
                     <a href="#about">Acerca de</a>
@@ -22,7 +27,29 @@ const LandingPage = ({ onGetStarted }) => {
                         Entrar <ArrowRight size={16} />
                     </button>
                 </div>
+
+                {/* Mobile Menu Toggle */}
+                <button 
+                    className="mobile-menu-toggle"
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
             </nav>
+
+            {/* Mobile Menu */}
+            <div className={`mobile-nav-menu ${isMobileMenuOpen ? 'open' : ''}`}>
+                <div className="mobile-nav-content">
+                    <a href="#features" onClick={() => setIsMobileMenuOpen(false)}>Características</a>
+                    <a href="#about" onClick={() => setIsMobileMenuOpen(false)}>Acerca de</a>
+                    <button className="btn-start-small mobile-nav-btn" onClick={() => {
+                        onGetStarted();
+                        setIsMobileMenuOpen(false);
+                    }}>
+                        Entrar <ArrowRight size={16} />
+                    </button>
+                </div>
+            </div>
 
             {/* Hero Section */}
             <header className="landing-hero">

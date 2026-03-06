@@ -4,6 +4,7 @@ import { APP_CONFIG, ANIMATION_CLASSES, DIFFICULTY_LABELS, QUIZ_COUNTS } from '.
 import ContentFilter from './utils/contentFilter.js';
 import Sidebar from './components/Sidebar';
 import MobileSidebar from './components/MobileSidebar';
+import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage';
 import AuthWrapper from './components/AuthWrapper';
 import LogoutModal from './components/LogoutModal';
@@ -719,23 +720,13 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
     <div className="app-shell">
       <div className="mouse-glow" />
       
-      {/* Botón de menú para móviles */}
-      <button 
-        className="mobile-menu-button"
-        onClick={() => setIsMobileSidebarOpen(true)}
-      >
-        <Menu size={24} />
-      </button>
-
-      {/* Sidebar desktop */}
-      <Sidebar screen={screen} onNavigate={handleNavigate} totalPoints={totalPoints} onLogout={() => setShowLogoutModal(true)} />
-      
-      {/* Sidebar móvil */}
-      <MobileSidebar 
-        isOpen={isMobileSidebarOpen}
-        onClose={() => setIsMobileSidebarOpen(false)}
+      {/* Navbar superior */}
+      <Navbar 
         currentScreen={screen}
         onNavigate={handleNavigate}
+        totalPoints={totalPoints}
+        onLogout={() => setShowLogoutModal(true)}
+        currentUser={currentUser}
       />
       
       <main className="main-content">
@@ -759,5 +750,6 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
       )}
     </div>
   );
+}
 
 export default App;

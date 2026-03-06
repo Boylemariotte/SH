@@ -1869,6 +1869,8 @@ body {
 .modal-actions {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .sidebar-logout-btn {
@@ -1896,7 +1898,10 @@ body {
 .btn-danger {
   background: var(--danger);
   color: white;
-  flex: 1;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-danger:hover {
