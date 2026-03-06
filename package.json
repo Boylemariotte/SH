@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:vercel": "concurrently \"npm run dev\" \"node dev-server.js\"",
-    "server": "node server/index.js",
+    "dev:vercel": "concurrently \"npm run dev\" \"node server/index.js\"",
+    "server": "node server/server.js",
     "build": "vite build",
     "build:prod": "npm ci && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "vite preview"
+    "start": "node server/server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
