@@ -23,6 +23,7 @@ import { usePoints } from './hooks/usePoints';
 import './styles/guideStyles.css';
 import './styles/quizHistory.css';
 import './styles/FileUpload.css';
+import './styles/responsive.css';
 
 // URL dinámica de la API
 const getApiUrl = () => {
