@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit';
 import { config } from './config.js';
 import { generateQuiz } from './groq.js';
 import connectDB from './database.js';
+import contentFilterMiddleware from './middleware/contentFilter.js';
 
 const app = express();
 
@@ -29,7 +30,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Rutas
-app.post('/api/generate-quiz', async (req, res) => {
+app.post('/api/generate-quiz', contentFilterMiddleware, async (req, res) => {
   const startTime = Date.now();
   
   try {

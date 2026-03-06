@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, BookOpen, Award, BarChart2, FileText, Settings, ArrowLeft, LogOut, AlertTriangle, Loader, Star, Heart, CheckCircle, XCircle } from 'lucide-react';
-import TiltCard from './components/TiltCard';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Star, Heart, Award, Target, TrendingUp, Loader, CheckCircle, XCircle, ChevronDown, ChevronUp, RotateCcw, Sparkles, BookOpen, FileText, BarChart2 } from 'lucide-react';
+import { APP_CONFIG, ANIMATION_CLASSES, DIFFICULTY_LABELS, QUIZ_COUNTS } from './constants/appConfig';
+import ContentFilter from './utils/contentFilter.js';
 import Sidebar from './components/Sidebar';
 import LandingPage from './components/LandingPage';
 import AuthWrapper from './components/AuthWrapper';
 import LogoutModal from './components/LogoutModal';
 import QuizHistory from './components/QuizHistory';
+import TiltCard from './components/TiltCard';
 import StatsRow from './components/StatsRow';
 import StreakBadge from './components/StreakBadge';
 import RewardsPanel from './components/RewardsPanel';
@@ -14,7 +16,6 @@ import AppHeader from './components/AppHeader';
 import PointsDisplay from './components/PointsDisplay';
 import PointsCelebration from './components/PointsCelebration';
 import MicroConfetti from './components/MicroConfetti';
-import { APP_CONFIG, ANIMATION_CLASSES, DIFFICULTY_LABELS, QUIZ_COUNTS } from './constants/appConfig';
 import AIRevealText from './components/AIRevealText';
 import GuideViewer from './components/GuideViewer';
 import GuideInput from './components/GuideInput';
@@ -239,6 +240,20 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
       setTopic(sourceInfo?.fileName || 'Archivo');
       return;
     }
+    
+    // Validar el tema antes de enviar
+    const validation = ContentFilter.validateInput(topic);
+    if (!validation.isValid) {
+      setError(validation.reason);
+      return;
+    }
+    
+    // Mostrar advertencia si no es educativo pero es válido
+    if (validation.isWarning) {
+      setError(validation.reason);
+      // Permitir continuar pero mostrar advertencia
+    }
+    
     if (!topic.trim()) return;
     setScreen('loading');
     try {
@@ -253,6 +268,14 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
   const handleGenerateGuide = async () => {
     if (!topic.trim()) return;
     setError('');
+    
+    // Validar el tema antes de enviar
+    const validation = ContentFilter.validateInput(topic);
+    if (!validation.isValid) {
+      setError(validation.reason);
+      return;
+    }
+    
     try {
       setScreen('guide_loading');
       const g = await generateGuideWithAI(topic, difficulty);
