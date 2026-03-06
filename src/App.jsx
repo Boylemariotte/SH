@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Star, Heart, Award, Target, TrendingUp, Loader, CheckCircle, XCircle, ChevronDown, ChevronUp, RotateCcw, Sparkles, BookOpen, FileText, BarChart2 } from 'lucide-react';
+import { Star, Heart, Award, Target, TrendingUp, Loader, CheckCircle, XCircle, ChevronDown, ChevronUp, RotateCcw, Sparkles, BookOpen, FileText, BarChart2, Menu, X } from 'lucide-react';
 import { APP_CONFIG, ANIMATION_CLASSES, DIFFICULTY_LABELS, QUIZ_COUNTS } from './constants/appConfig';
 import ContentFilter from './utils/contentFilter.js';
 import Sidebar from './components/Sidebar';
+import MobileSidebar from './components/MobileSidebar';
 import LandingPage from './components/LandingPage';
 import AuthWrapper from './components/AuthWrapper';
 import LogoutModal from './components/LogoutModal';
@@ -91,6 +92,7 @@ function App() {
   const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('isLoggedIn') === 'true';
   });
@@ -716,10 +718,30 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
   return (
     <div className="app-shell">
       <div className="mouse-glow" />
+      
+      {/* Botón de menú para móviles */}
+      <button 
+        className="mobile-menu-button"
+        onClick={() => setIsMobileSidebarOpen(true)}
+      >
+        <Menu size={24} />
+      </button>
+
+      {/* Sidebar desktop */}
       <Sidebar screen={screen} onNavigate={handleNavigate} totalPoints={totalPoints} onLogout={() => setShowLogoutModal(true)} />
+      
+      {/* Sidebar móvil */}
+      <MobileSidebar 
+        isOpen={isMobileSidebarOpen}
+        onClose={() => setIsMobileSidebarOpen(false)}
+        currentScreen={screen}
+        onNavigate={handleNavigate}
+      />
+      
       <main className="main-content">
         {renderMainContent()}
       </main>
+      
       {showLogoutModal && <LogoutModal onConfirm={handleLogout} onCancel={() => setShowLogoutModal(false)} />}
       {showPointsCelebration && (
         <PointsCelebration 
@@ -737,6 +759,5 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
       )}
     </div>
   );
-}
 
 export default App;
