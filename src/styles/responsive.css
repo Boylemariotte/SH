@@ -765,7 +765,23 @@
   .main-content {
     margin-left: 0;
     padding: 1rem;
-    padding-top: 0.5rem;
+    padding-top: 2rem; /* Más espacio para evitar el navbar */
+  }
+  
+  /* Page Headers responsive */
+  .page-header {
+    margin-bottom: 2rem;
+    margin-top: 0.5rem;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  .page-subtitle {
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
   }
   
   .quiz-shell {
@@ -846,7 +862,31 @@
   
   .main-content {
     padding: 0.75rem;
-    padding-top: 0.25rem;
+    padding-top: 1.5rem; /* Más espacio para evitar el navbar */
+  }
+  
+  /* Page Headers responsive */
+  .page-header {
+    margin-bottom: 1.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .page-title {
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+  
+  .page-subtitle {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  .duo-title {
+    font-size: 1.5rem;
+  }
+  
+  .duo-subtitle {
+    font-size: 0.85rem;
   }
   
   .quiz-shell {
