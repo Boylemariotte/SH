@@ -169,14 +169,31 @@
 
   .guide-section-header {
     padding: 0.85rem 1rem;
+    background: linear-gradient(to right, #f8fafc 0%, #f1f5f9 100%);
+    color: #0f172a;
   }
 
   .guide-section-header h2 {
     font-size: 1rem;
+    color: #0f172a;
+  }
+
+  .guide-section-header svg {
+    color: #475569;
   }
 
   .guide-section-content {
     padding: 1rem;
+    background: #f9fafb;
+    color: #374151;
+  }
+
+  .guide-section-content h2 {
+    color: #1f2937;
+  }
+
+  .guide-section-content p {
+    color: #6b7280;
   }
 
   .guide-actions {
@@ -188,6 +205,24 @@
   .download-button {
     width: 100%;
     justify-content: center;
+  }
+
+  /* Preguntas clave responsive */
+  .key-questions p {
+    color: #1f2937;
+    font-weight: 500;
+  }
+
+  .key-question {
+    background: #f8fafc;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+
+  .key-question:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
   }
 }
 
@@ -380,16 +415,24 @@
   font-size: 1.05rem;
 }
 
+/* Estilo universal para preguntas clave - Máxima prioridad */
+.key-questions * {
+  color: #000000 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+}
+
 /* Preguntas clave */
 .key-questions {
   background: transparent;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 }
 
 .key-questions p {
   margin-top: 0;
-  color: #1f2937;
-  font-size: 1rem;
-  font-weight: 500;
+  color: #000000 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
 }
 
 .key-questions ul {
@@ -399,7 +442,7 @@
 }
 
 .key-question {
-  background: #f8fafc;
+  background: #f8fafc !important;
   padding: 0.75rem 1rem;
   margin-bottom: 0.6rem;
   border-radius: 8px;
@@ -408,20 +451,28 @@
   gap: 0.6rem;
   transition: all 0.2s ease;
   font-size: 1rem;
-  color: #0f172a;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
 }
 
 .key-question:hover {
-  background: #f1f5f9;
+  background: #f1f5f9 !important;
   border-color: #cbd5e1;
   transform: translateX(3px);
-  color: #0f172a;
+  color: #000000 !important;
+}
+
+.key-question span {
+  color: #000000 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
 }
 
 .question-number {
   font-weight: 700;
   color: #4f46e5;
   min-width: 1.5rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
 }
 
 .study-tip {

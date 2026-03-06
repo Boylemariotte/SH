@@ -476,7 +476,7 @@ body {
   width: var(--sidebar-width);
   background: var(--sidebar-bg);
   border-right: 1px solid var(--border);
-  display: flex;
+  display: flex !important;
   flex-direction: column;
   position: fixed;
   top: 0;
@@ -484,6 +484,8 @@ body {
   height: 100vh;
   z-index: 100;
   padding: 1.5rem 0;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .sidebar-logo {
@@ -587,6 +589,8 @@ body {
   padding: 2.5rem 2.5rem 2.5rem 3rem;
   min-height: 100vh;
   position: relative;
+  display: block !important; /* Asegurar que siempre sea visible */
+  margin-right: 2.5rem; /* Asegurar que main-content tenga el margen correcto por defecto para desktop */
 }
 
 /* ---- Page Header ---- */

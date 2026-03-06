@@ -117,6 +117,17 @@ function App() {
   const [error, setError] = useState('');
   const [userAnswers, setUserAnswers] = useState([]);
   const [earnedPoints, setEarnedPoints] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Detectar tamaño de pantalla
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [guide, setGuide] = useState(null);
   const [isGeneratingGuide, setIsGeneratingGuide] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -720,14 +731,29 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
     <div className="app-shell">
       <div className="mouse-glow" />
       
-      {/* Navbar superior */}
-      <Navbar 
-        currentScreen={screen}
-        onNavigate={handleNavigate}
-        totalPoints={totalPoints}
-        onLogout={() => setShowLogoutModal(true)}
-        currentUser={currentUser}
-      />
+      {/* Sidebar - Solo en desktop */}
+      {!isMobile && (
+        <Sidebar 
+          currentScreen={screen}
+          onNavigate={handleNavigate}
+          totalPoints={totalPoints}
+          onLogout={() => setShowLogoutModal(true)}
+          currentUser={currentUser}
+          isOpen={isSidebarOpen}
+          onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+        />
+      )}
+      
+      {/* Navbar superior - Solo en móvil */}
+      {isMobile && (
+        <Navbar 
+          currentScreen={screen}
+          onNavigate={handleNavigate}
+          totalPoints={totalPoints}
+          onLogout={() => setShowLogoutModal(true)}
+          currentUser={currentUser}
+        />
+      )}
       
       <main className="main-content">
         {renderMainContent()}
