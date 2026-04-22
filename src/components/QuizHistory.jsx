@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, CheckCircle, XCircle, ChevronDown, ChevronUp, Award, Target, TrendingUp, RotateCcw } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, ChevronDown, ChevronUp, Award, Target, TrendingUp, RotateCcw, Trophy, Target as TargetIcon, Dumbbell, BookOpen, BarChart3 } from 'lucide-react';
 import '../styles/quizHistory.css';
 
 const QuizHistory = ({ history, onRetryQuiz }) => {
@@ -29,17 +29,17 @@ const QuizHistory = ({ history, onRetryQuiz }) => {
     return colors[difficulty] || '#6b7280';
   };
 
-  const getScoreEmoji = (score) => {
-    if (score >= 90) return '🏆';
-    if (score >= 70) return '🎯';
-    if (score >= 50) return '💪';
-    return '📚';
+  const getScoreIcon = (score) => {
+    if (score >= 90) return <Trophy size={20} className="score-icon" />;
+    if (score >= 70) return <TargetIcon size={20} className="score-icon" />;
+    if (score >= 50) return <Dumbbell size={20} className="score-icon" />;
+    return <BookOpen size={20} className="score-icon" />;
   };
 
   if (!history || history.length === 0) {
     return (
       <div className="no-history">
-        <div className="no-history-icon">📊</div>
+        <BarChart3 size={48} className="no-history-icon" />
         <h3>No hay historial de quizzes</h3>
         <p>Completa tu primer quiz para ver tu progreso aquí</p>
       </div>
@@ -72,7 +72,7 @@ const QuizHistory = ({ history, onRetryQuiz }) => {
               <div className="quiz-main-info">
                 <div className="quiz-title-row">
                   <div className="quiz-topic">
-                    <span className="topic-emoji">{getScoreEmoji(quiz.score)}</span>
+                    <span className="topic-icon">{getScoreIcon(quiz.score)}</span>
                     <span className="topic-text">{quiz.topic || 'Quiz'}</span>
                   </div>
                   <div 

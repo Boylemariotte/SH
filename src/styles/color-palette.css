@@ -1,0 +1,321 @@
+/* ============================================================
+   COLOR PALETTE - Study Helper Harmonized Theme
+   ============================================================ */
+
+:root {
+  /* Primary Palette - Blue/Purple Harmony */
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --primary-900: #1e3a8a;
+
+  /* Secondary Palette - Purple Accent */
+  --secondary-50: #faf5ff;
+  --secondary-100: #f3e8ff;
+  --secondary-200: #e9d5ff;
+  --secondary-300: #d8b4fe;
+  --secondary-400: #c084fc;
+  --secondary-500: #a855f7;
+  --secondary-600: #9333ea;
+  --secondary-700: #7c3aed;
+  --secondary-800: #6b21a8;
+  --secondary-900: #581c87;
+
+  /* Neutral Palette - Dark Theme */
+  --neutral-50: #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+  --neutral-950: #020617;
+
+  /* Semantic Colors - Harmonized with Primary */
+  --success-50: #ecfdf5;
+  --success-100: #d1fae5;
+  --success-200: #a7f3d0;
+  --success-300: #6ee7b7;
+  --success-400: #34d399;
+  --success-500: #10b981;
+  --success-600: #059669;
+  --success-700: #047857;
+  --success-800: #065f46;
+  --success-900: #064e3b;
+
+  --warning-50: #fffbeb;
+  --warning-100: #fef3c7;
+  --warning-200: #fde68a;
+  --warning-300: #fcd34d;
+  --warning-400: #fbbf24;
+  --warning-500: #f59e0b;
+  --warning-600: #d97706;
+  --warning-700: #b45309;
+  --warning-800: #92400e;
+  --warning-900: #78350f;
+
+  --error-50: #fef2f2;
+  --error-100: #fee2e2;
+  --error-200: #fecaca;
+  --error-300: #fca5a5;
+  --error-400: #f87171;
+  --error-500: #ef4444;
+  --error-600: #dc2626;
+  --error-700: #b91c1c;
+  --error-800: #991b1b;
+  --error-900: #7f1d1d;
+
+  /* Application Variables - Updated for Harmony */
+  --bg-primary: var(--neutral-950);
+  --bg-secondary: var(--neutral-900);
+  --bg-tertiary: var(--neutral-800);
+  --bg-card: var(--neutral-850);
+  --bg-card-hover: var(--neutral-800);
+  --bg-input: var(--neutral-800);
+  --bg-overlay: rgba(15, 23, 42, 0.8);
+  
+  --sidebar-bg: var(--neutral-900);
+  --sidebar-width: 280px;
+  
+  --accent: var(--primary-500);
+  --accent-hover: var(--primary-600);
+  --accent-light: rgba(59, 130, 246, 0.15);
+  --accent-glow: rgba(59, 130, 246, 0.3);
+  --accent-ultra-light: rgba(59, 130, 246, 0.05);
+  
+  --accent-secondary: var(--secondary-500);
+  --accent-secondary-hover: var(--secondary-600);
+  --accent-secondary-light: rgba(168, 85, 247, 0.15);
+  
+  --text-primary: var(--neutral-50);
+  --text-secondary: var(--neutral-400);
+  --text-muted: var(--neutral-500);
+  --text-inverse: var(--neutral-950);
+  
+  --border: rgba(148, 163, 184, 0.1);
+  --border-hover: rgba(59, 130, 246, 0.3);
+  --border-focus: var(--primary-500);
+  
+  --success: var(--success-500);
+  --success-light: var(--success-100);
+  --success-dark: var(--success-700);
+  
+  --warning: var(--warning-500);
+  --warning-light: var(--warning-100);
+  --warning-dark: var(--warning-700);
+  
+  --error: var(--error-500);
+  --error-light: var(--error-100);
+  --error-dark: var(--error-700);
+  
+  --info: var(--primary-500);
+  --info-light: var(--primary-100);
+  --info-dark: var(--primary-700);
+  
+  /* Special Colors */
+  --gold: var(--warning-500);
+  --silver: var(--neutral-400);
+  --bronze: #d97706;
+  
+  /* Gradient Definitions */
+  --gradient-primary: linear-gradient(135deg, var(--primary-600), var(--primary-500));
+  --gradient-secondary: linear-gradient(135deg, var(--secondary-600), var(--secondary-500));
+  --gradient-success: linear-gradient(135deg, var(--success-600), var(--success-500));
+  --gradient-warning: linear-gradient(135deg, var(--warning-600), var(--warning-500));
+  --gradient-error: linear-gradient(135deg, var(--error-600), var(--error-500));
+  --gradient-neutral: linear-gradient(135deg, var(--neutral-800), var(--neutral-700));
+  
+  --gradient-bg: linear-gradient(-45deg, var(--neutral-950), var(--neutral-900), var(--neutral-950), var(--neutral-900));
+  --gradient-card: linear-gradient(135deg, var(--neutral-800), var(--neutral-850));
+  --gradient-overlay: linear-gradient(180deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.95));
+  
+  /* Shadow System */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  --shadow-accent: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+  --shadow-success: 0 4px 14px 0 rgba(16, 185, 129, 0.3);
+  --shadow-warning: 0 4px 14px 0 rgba(245, 158, 11, 0.3);
+  --shadow-error: 0 4px 14px 0 rgba(239, 68, 68, 0.3);
+  --shadow-secondary: 0 4px 14px 0 rgba(168, 85, 247, 0.3);
+  
+  /* Animation Colors */
+  --mouse-glow: radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(59, 130, 246, 0.15), transparent 50%);
+  --accent-pulse: rgba(59, 130, 246, 0.4);
+  --success-pulse: rgba(16, 185, 129, 0.4);
+  --warning-pulse: rgba(245, 158, 11, 0.4);
+  --error-pulse: rgba(239, 68, 68, 0.4);
+}
+
+/* Dark Mode Overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Already optimized for dark mode */
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --border: rgba(148, 163, 184, 0.3);
+    --border-hover: rgba(59, 130, 246, 0.6);
+    --text-secondary: var(--neutral-300);
+    --text-muted: var(--neutral-400);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    /* Keep colors but remove gradient animations */
+    --gradient-bg: var(--bg-primary);
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Color Utilities */
+.bg-accent { background-color: var(--accent); }
+.bg-accent-light { background-color: var(--accent-light); }
+.bg-success { background-color: var(--success); }
+.bg-warning { background-color: var(--warning); }
+.bg-error { background-color: var(--error); }
+
+.text-accent { color: var(--accent); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-error { color: var(--error); }
+
+.border-accent { border-color: var(--accent); }
+.border-success { border-color: var(--success); }
+.border-warning { border-color: var(--warning); }
+.border-error { border-color: var(--error); }
+
+/* Component-Specific Color Overrides */
+.quiz-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
+}
+
+.quiz-option:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+}
+
+.quiz-option-correct {
+  background: var(--success-light);
+  border-color: var(--success);
+  color: var(--success-dark);
+}
+
+.quiz-option-incorrect {
+  background: var(--error-light);
+  border-color: var(--error);
+  color: var(--error-dark);
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+  background: var(--gradient-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-accent);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+}
+
+.btn-success {
+  background: var(--gradient-success);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-warning {
+  background: var(--gradient-warning);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-error {
+  background: var(--gradient-error);
+  color: white;
+  border: 1px solid transparent;
+}
+
+/* Form Elements */
+.form-input {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.form-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.form-select {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.form-select:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+/* Status Colors */
+.status-success {
+  color: var(--success);
+  background: var(--success-light);
+  border: 1px solid var(--success);
+}
+
+.status-warning {
+  color: var(--warning);
+  background: var(--warning-light);
+  border: 1px solid var(--warning);
+}
+
+.status-error {
+  color: var(--error);
+  background: var(--error-light);
+  border: 1px solid var(--error);
+}
+
+.status-info {
+  color: var(--info);
+  background: var(--info-light);
+  border: 1px solid var(--info);
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Flame, Target, BookOpen } from 'lucide-react';
 
 const StatsCards = ({ dailyStreak, accuracyPercentage, totalQuizzes }) => {
   return (
@@ -28,7 +29,7 @@ const StatsCards = ({ dailyStreak, accuracyPercentage, totalQuizzes }) => {
       onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
       onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
       >
-        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔥</div>
+        <Flame size={32} style={{ marginBottom: '0.5rem' }} />
         <div style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
           {dailyStreak}
         </div>
@@ -53,7 +54,7 @@ const StatsCards = ({ dailyStreak, accuracyPercentage, totalQuizzes }) => {
       onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
       onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
       >
-        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎯</div>
+        <Target size={32} style={{ marginBottom: '0.5rem' }} />
         <div style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
           {accuracyPercentage}%
         </div>
@@ -78,7 +79,7 @@ const StatsCards = ({ dailyStreak, accuracyPercentage, totalQuizzes }) => {
       onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
       onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
       >
-        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📚</div>
+        <BookOpen size={32} style={{ marginBottom: '0.5rem' }} />
         <div style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.25rem' }}>
           {totalQuizzes}
         </div>

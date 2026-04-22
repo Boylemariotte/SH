@@ -1,7 +1,8 @@
 import React from 'react';
-import { LogOut } from 'lucide-react';
+import { LogOut, RefreshCw } from 'lucide-react';
 import PointsDisplay from './PointsDisplay';
 import { APP_CONFIG } from '../constants/appConfig';
+import { StudyIcons } from './Icon';
 
 function Sidebar({ screen, onNavigate, totalPoints, onLogout }) {
   return (
@@ -18,11 +19,11 @@ function Sidebar({ screen, onNavigate, totalPoints, onLogout }) {
 
       <nav className="sidebar-nav">
         {[
-          { id: 'input', label: 'Modo Quiz', icon: '⚡' },
-          { id: 'guide_input', label: 'Guía de Estudio', icon: '📚' },
-          { id: 'study_from_file', label: 'Subir Archivo', icon: '📄' },
-          { id: 'history', label: 'Historial', icon: '📋' },
-          { id: 'stats', label: 'Estadísticas', icon: '📊' },
+          { id: 'input', label: 'Modo Quiz', icon: <StudyIcons.nav.quiz /> },
+          { id: 'guide_input', label: 'Guía de Estudio', icon: <StudyIcons.nav.guide /> },
+          { id: 'study_from_file', label: 'Subir Archivo', icon: <StudyIcons.nav.study /> },
+          { id: 'history', label: 'Historial', icon: <StudyIcons.ui.menu /> },
+          { id: 'stats', label: 'Estadísticas', icon: <StudyIcons.nav.stats /> },
         ].map(item => (
           <button
             key={item.id}
@@ -39,6 +40,17 @@ function Sidebar({ screen, onNavigate, totalPoints, onLogout }) {
         <div className="sidebar-points">
           <PointsDisplay totalPoints={totalPoints} />
         </div>
+        <button 
+          className="sidebar-reset-btn" 
+          onClick={() => {
+            localStorage.removeItem('hasSeenOnboarding');
+            window.location.reload();
+          }}
+          title="Reiniciar tutorial"
+        >
+          <RefreshCw size={16} />
+          <span>Tutorial</span>
+        </button>
         <button className="sidebar-logout-btn" onClick={onLogout}>
           <LogOut size={20} />
           <span>Cerrar sesión</span>

@@ -116,7 +116,7 @@ const StudyFromFile = ({
         <div className="mode-layout">
           <TiltCard className="ss-card animate-fade-in-up stagger-2">
             {/* Status Panel */}
-            <div className="info-panel info-panel-green">
+            <div className="info-panel info-panel-purple">
               <div className="info-panel-header">
                 <CheckCircle size={16} /> Archivo procesado correctamente
               </div>
@@ -270,14 +270,21 @@ const StudyFromFile = ({
           )}
         </TiltCard>
 
-        <TiltCard className="rewards-card animate-fade-in-up stagger-3" style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)' }}>
+        <TiltCard className="rewards-card animate-fade-in-up stagger-3" style={{ background: 'linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-secondary-hover) 100%)' }}>
           <div className="rewards-title">
             <FileText size={18} /> Archivos soportados
           </div>
           <p style={{ fontSize: '0.850rem', lineHeight: '1.5', opacity: 0.9, marginBottom: '1rem' }}>
             Puedes subir archivos de texto (.txt) o PDF para que nuestra IA los analice y genere contenido personalizado.
           </p>
-          <div className="info-panel" style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white' }}>
+          <div className="info-panel" style={{ 
+            background: 'rgba(168, 85, 247, 0.15)', 
+            border: '1px solid rgba(168, 85, 247, 0.3)',
+            borderRadius: '8px',
+            padding: '1rem',
+            color: 'white',
+            boxShadow: '0 2px 8px rgba(168, 85, 247, 0.2)'
+          }}>
             <div className="info-panel-header"><Sparkles size={14} /> Tip:</div>
             Asegúrate de que el texto sea claro para obtener mejores resultados en los quizzes.
           </div>

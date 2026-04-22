@@ -1,10 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, ArrowLeft, ChevronDown, ChevronUp, Book, Link as LinkIcon } from 'lucide-react';
+import { BookOpen, ArrowLeft, ChevronDown, ChevronUp, Book, Link as LinkIcon, Eye, EyeOff } from 'lucide-react';
 import ArchiveResources from './ArchiveResources';
 import '../styles/guideStyles.css';
 
 const GuideViewer = ({ guide, onBack }) => {
   const [expandedSections, setExpandedSections] = useState({});
+  const [readingMode, setReadingMode] = useState(false);
+
+  // Función auxiliar para mostrar etiquetas amigables de dificultad
+  const getDifficultyLabel = (difficulty) => {
+    const labels = {
+      facil: 'Principiante',
+      medio: 'Intermedio',
+      dificil: 'Avanzado',
+      experto: 'Experto'
+    };
+    return labels[difficulty] || difficulty;
+  };
 
   // Inicializar todas las secciones como expandidas
   useEffect(() => {
@@ -801,99 +813,133 @@ const GuideViewer = ({ guide, onBack }) => {
   };
 
   return (
-    <div className="guide-container">
-      <button
-        onClick={onBack}
-        className="back-button"
-        aria-label="Volver al menú principal"
-      >
-        <ArrowLeft size={20} style={{ marginRight: '8px' }} />
-        Volver al menú
-      </button>
-
-      <div className="guide-header">
-        <div className="guide-icon">
-          <BookOpen size={40} />
-        </div>
-        <div>
-          <h1 className="guide-title">{guide.topic}</h1>
-          <div className="guide-meta">
-            <span className="guide-difficulty">
-              <span className="meta-label">Nivel:</span> {getDifficultyLabel(guide.difficulty)}
-            </span>
-            <span className="guide-date">
-              <span className="meta-label">Generada el:</span> {new Date().toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-              })}
-            </span>
+    <div className={`guide-container ${readingMode ? 'reading-mode' : ''}`}>
+      {/* Overlay de enfoque para modo lectura */}
+      {readingMode && (
+        <div className="reading-focus-overlay">
+          <div className="reading-focus-content">
+            {guide.content ? (
+              <div className="guide-text">
+                {formatGuideText(guide.content)}
+              </div>
+            ) : (
+              <div className="guide-loading">
+                <div className="guide-loading-spinner"></div>
+                <p>Generando tu guía de estudio...</p>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
+      
+      {/* Contenido normal (visible cuando no está en modo lectura) */}
+      {!readingMode && (
+        <>
+          <button
+            onClick={onBack}
+            className="back-button"
+            aria-label="Volver al menú principal"
+          >
+            <ArrowLeft size={20} style={{ marginRight: '8px' }} />
+            Volver al menú
+          </button>
 
-      <div className="guide-content">
-        {guide.content ? (
-          <div className="guide-text">
-            {formatGuideText(guide.content)}
+          <div className="guide-header">
+            <div className="guide-icon">
+              <BookOpen size={40} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h1 className="guide-title">{guide.topic}</h1>
+              <div className="guide-meta">
+                <span className="guide-difficulty">
+                  <span className="meta-label">Nivel:</span> {getDifficultyLabel(guide.difficulty)}
+                </span>
+                <span className="guide-date">
+                  <span className="meta-label">Generada el:</span> {new Date().toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => setReadingMode(!readingMode)}
+              className={`reading-mode-toggle ${readingMode ? 'active' : ''}`}
+              title={readingMode ? 'Desactivar modo de lectura' : 'Activar modo de lectura'}
+            >
+              {readingMode ? <EyeOff size={18} /> : <Eye size={18} />}
+              <span>{readingMode ? 'Modo normal' : 'Modo lectura'}</span>
+            </button>
           </div>
-        ) : (
-          <div className="guide-loading">
-            <div className="guide-loading-spinner"></div>
-            <p>Generando tu guía de estudio...</p>
+
+          <div className="guide-content">
+            {guide.content ? (
+              <div className="guide-text">
+                {formatGuideText(guide.content)}
+              </div>
+            ) : (
+              <div className="guide-loading">
+                <div className="guide-loading-spinner"></div>
+                <p>Generando tu guía de estudio...</p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      <div className="guide-actions">
-        <button
-          onClick={() => window.print()}
-          className="print-button"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
-            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-            <rect x="6" y="14" width="12" height="8"></rect>
-          </svg>
-          Imprimir guía
-        </button>
-        <button
-          onClick={() => {
-            const element = document.createElement('a');
-            const file = new Blob([document.querySelector('.guide-content').innerText], { type: 'text/plain' });
-            element.href = URL.createObjectURL(file);
-            element.download = `Guia-de-Estudio-${guide.topic.replace(/\s+/g, '-')}.txt`;
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-          }}
-          className="download-button"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Descargar como TXT
-        </button>
-      </div>
+          <div className="guide-actions">
+            <button
+              onClick={() => window.print()}
+              className="print-button"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              Imprimir guía
+            </button>
+            <button
+              onClick={() => {
+                const element = document.createElement('a');
+                const file = new Blob([document.querySelector('.guide-text').innerText], { type: 'text/plain' });
+                element.href = URL.createObjectURL(file);
+                element.download = `Guia-de-Estudio-${guide.topic.replace(/\s+/g, '-')}.txt`;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+              }}
+              className="download-button"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Descargar como TXT
+            </button>
+          </div>
 
-      <div className="guide-footer">
-        <p>© {new Date().getFullYear()} StudyHelper AI - Herramienta educativa con IA</p>
-      </div>
+          <div className="guide-footer">
+            <p> StudyHelper AI - Herramienta educativa con IA</p>
+          </div>
+        </>
+      )}
+      
+      {/* Botón de control flotante para modo lectura */}
+      {readingMode && (
+        <div className="reading-mode-controls">
+          <button
+            onClick={() => setReadingMode(false)}
+            className="reading-exit-btn"
+            title="Salir del modo de lectura"
+          >
+            <EyeOff size={20} />
+            <span>Salir del modo lectura</span>
+          </button>
+        </div>
+      )}
     </div>
   );
-};
-
-// Función auxiliar para mostrar etiquetas amigables de dificultad
-const getDifficultyLabel = (difficulty) => {
-  const labels = {
-    facil: '😊 Principiante',
-    medio: '🧠 Intermedio',
-    dificil: '🔥 Avanzado',
-    experto: '💎 Experto'
-  };
-  return labels[difficulty] || difficulty;
 };
 
 export default React.memo(GuideViewer);

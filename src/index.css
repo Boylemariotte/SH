@@ -7,31 +7,37 @@
 }
 
 :root {
-  --bg-primary: #0d0d0f;
-  --bg-secondary: #141416;
-  --bg-card: #1a1a1e;
-  --bg-card-hover: #202025;
-  --sidebar-bg: #111113;
+  /* Updated Color Palette - Blue/Purple Harmony */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-card-hover: #334155;
+  --sidebar-bg: #1e293b;
   --sidebar-width: 280px;
-  --accent: #8b5cf6;
-  --accent-hover: #7c3aed;
-  --accent-light: rgba(139, 92, 246, 0.15);
-  --accent-glow: rgba(139, 92, 246, 0.3);
-  --text-primary: #f1f0f5;
-  --text-secondary: #9794a8;
-  --text-muted: #5a5870;
-  --border: rgba(255, 255, 255, 0.06);
-  --border-hover: rgba(139, 92, 246, 0.4);
-  --input-bg: #1e1e24;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-light: rgba(59, 130, 246, 0.15);
+  --accent-glow: rgba(59, 130, 246, 0.3);
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border: rgba(148, 163, 184, 0.1);
+  --border-hover: rgba(59, 130, 246, 0.3);
+  --input-bg: #334155;
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
   --gold: #f59e0b;
+  
+  /* Secondary accent colors */
+  --accent-secondary: #a855f7;
+  --accent-secondary-hover: #9333ea;
+  --accent-secondary-light: rgba(168, 85, 247, 0.15);
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(-45deg, #0d0d0f, #141416, #1a1528, #111113);
+  background: linear-gradient(-45deg, #0f172a, #1e293b, #1a1528, #1e293b);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
   color: var(--text-primary);
@@ -62,7 +68,7 @@ body {
   pointer-events: none;
   z-index: 100;
   background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(139, 92, 246, 0.08),
+      rgba(59, 130, 246, 0.08),
       transparent 40%);
 }
 
@@ -537,7 +543,7 @@ body {
   padding: 0.75rem 1.15rem;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   color: var(--text-secondary);
   font-size: 0.95rem;
   font-weight: 500;
@@ -545,17 +551,35 @@ body {
   background: transparent;
   width: 100%;
   text-align: left;
+  position: relative;
+  overflow: hidden;
 }
 
 .sidebar-nav-item:hover {
   background: var(--bg-card);
   color: var(--text-primary);
+  transform: translateX(3px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .sidebar-nav-item.active {
   background: var(--accent-light);
   color: var(--accent);
   border-color: var(--border-hover);
+  font-weight: 600;
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .sidebar-nav-item svg {
@@ -580,6 +604,40 @@ body {
   font-weight: 700;
   font-size: 0.95rem;
   border: 1px solid var(--border-hover);
+}
+
+.sidebar-reset-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+  background: #e0e7ff;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.sidebar-reset-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.sidebar-reset-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.sidebar-reset-btn:hover svg {
+  transform: rotate(180deg);
 }
 
 /* ---- Main Content ---- */
@@ -1970,7 +2028,275 @@ body {
   margin-top: 1rem;
 }
 
-/* Landing Responsive */
+/* ============================================================
+   MOBILE CENTERING FIXES - Comprehensive centering solution
+   ============================================================ */
+
+/* Mobile centering for all containers */
+@media (max-width: 768px) {
+  /* Main app container */
+  .app {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Page containers */
+  .page-container,
+  .container,
+  .main-container {
+    padding: 1rem 0.5rem !important;
+    margin: 0 auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  
+  /* Card containers */
+  .card,
+  .ss-card,
+  .tilt-card,
+  .quiz-card,
+  .mode-card {
+    margin: 0 auto 1rem auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+  
+  /* Headers and titles */
+  .page-header,
+  .header,
+  .section-header {
+    text-align: center !important;
+    padding: 1rem 0.5rem !important;
+    margin: 0 auto 1rem auto !important;
+    width: 100% !important;
+  }
+  
+  .page-title,
+  .title,
+  h1, h2, h3, h4, h5, h6 {
+    text-align: center !important;
+    margin: 0 auto 0.5rem auto !important;
+    width: 100% !important;
+  }
+  
+  .page-subtitle,
+  .subtitle {
+    text-align: center !important;
+    margin: 0 auto 1rem auto !important;
+    width: 100% !important;
+    padding: 0 0.5rem !important;
+  }
+  
+  /* Forms and inputs */
+  .form-container,
+  .form-group {
+    text-align: center !important;
+    margin: 0 auto 1rem auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .form-label {
+    text-align: center !important;
+    display: block !important;
+    margin: 0 auto 0.5rem auto !important;
+    width: 100% !important;
+  }
+  
+  .form-input,
+  .form-select,
+  input,
+  select,
+  textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto 0.5rem auto !important;
+    text-align: left !important;
+  }
+  
+  /* Buttons */
+  .btn,
+  button {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0.5rem auto !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+  
+  .btn-group,
+  .button-group {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
+  }
+  
+  .btn-group .btn,
+  .button-group button {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  
+  /* Grid layouts */
+  .mode-layout,
+  .grid-layout,
+  .quiz-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+  
+  /* Flex layouts */
+  .flex-layout,
+  .flex-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+  
+  /* Text elements */
+  p, span, div {
+    max-width: 100% !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  
+  /* Lists */
+  ul, ol {
+    text-align: left !important;
+    margin: 0 auto 1rem auto !important;
+    padding: 0 1rem !important;
+    max-width: 100% !important;
+  }
+  
+  li {
+    text-align: left !important;
+    margin: 0.25rem 0 !important;
+    word-wrap: break-word !important;
+  }
+  
+  /* Images and media */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    display: block !important;
+  }
+  
+  /* Tables */
+  table {
+    width: 100% !important;
+    margin: 0 auto 1rem auto !important;
+    font-size: 0.9rem !important;
+  }
+  
+  th, td {
+    text-align: center !important;
+    padding: 0.5rem !important;
+  }
+  
+  /* Loading states */
+  .loading,
+  .skeleton,
+  .spinner {
+    margin: 2rem auto !important;
+    text-align: center !important;
+    display: block !important;
+  }
+  
+  /* Error and success messages */
+  .error-message,
+  .success-message,
+  .info-message {
+    text-align: center !important;
+    margin: 1rem auto !important;
+    padding: 1rem 0.5rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Navigation */
+  .nav,
+  .navigation {
+    text-align: center !important;
+    padding: 1rem 0.5rem !important;
+  }
+  
+  .nav-item,
+  .nav-link {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    margin: 0.25rem 0 !important;
+  }
+  
+  /* Sidebar adjustments */
+  .sidebar {
+    width: 100% !important;
+    text-align: center !important;
+  }
+  
+  /* Footer */
+  .footer,
+  .guide-footer {
+    text-align: center !important;
+    padding: 1rem 0.5rem !important;
+    margin: 2rem auto 0 auto !important;
+    width: 100% !important;
+  }
+}
+
+/* Small mobile specific fixes */
+@media (max-width: 480px) {
+  .page-container,
+  .container,
+  .main-container {
+    padding: 0.5rem 0.25rem !important;
+  }
+  
+  .page-title,
+  .title,
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2 {
+    font-size: 1.3rem !important;
+  }
+  
+  h3 {
+    font-size: 1.1rem !important;
+  }
+  
+  .btn,
+  button {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .form-input,
+  .form-select,
+  input,
+  select,
+  textarea {
+    padding: 0.75rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .card,
+  .ss-card,
+  .tilt-card {
+    padding: 1rem !important;
+    margin: 0 auto 0.75rem auto !important;
+  }
+}
 @media (max-width: 768px) {
   .landing-nav-links {
     display: none;

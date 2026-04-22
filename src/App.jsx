@@ -18,6 +18,8 @@ import AppHeader from './components/AppHeader';
 import PointsDisplay from './components/PointsDisplay';
 import PointsCelebration from './components/PointsCelebration';
 import MicroConfetti from './components/MicroConfetti';
+import OnboardingTour from './components/OnboardingTour';
+import FeedbackToast, { useFeedback, FeedbackContainer } from './components/FeedbackToast';
 import AIRevealText from './components/AIRevealText';
 import GuideViewer from './components/GuideViewer';
 import GuideInput from './components/GuideInput';
@@ -26,6 +28,10 @@ import './styles/guideStyles.css';
 import './styles/quizHistory.css';
 import './styles/FileUpload.css';
 import './styles/responsive.css';
+import './styles/onboarding.css';
+import './styles/feedback.css';
+import './styles/icons.css';
+import './styles/color-palette.css';
 
 // URL dinámica de la API
 const getApiUrl = () => {
@@ -134,7 +140,18 @@ function App() {
   const [showPointsCelebration, setShowPointsCelebration] = useState(false);
   const [microConfetti, setMicroConfetti] = useState({ active: false, x: 0, y: 0 });
 
+  // Onboarding state
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    // Mostrar onboarding solo a usuarios nuevos
+    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+    const isNewUser = !hasSeenOnboarding && isLoggedIn;
+    return isNewUser;
+  });
+
   const { totalPoints, calculatePoints, addPoints, resetPoints, POINTS_BY_DIFFICULTY } = usePoints();
+  
+  // Feedback system
+  const { showSuccess, showError, showWarning, showInfo, showCelebration: showCelebrationFeedback, showAchievement, showTarget } = useFeedback();
 
   const [userStats, setUserStats] = useState(() => {
     const saved = localStorage.getItem('userStats');
@@ -253,6 +270,7 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
       setUserAnswers([]); setScreen('quiz');
       setCurrentQuestion(0); setScore(0); setLives(3); setStreak(0);
       setTopic(sourceInfo?.fileName || 'Archivo');
+      showSuccess('Quiz cargado desde archivo. ¡Vamos a estudiar!');
       return;
     }
     
@@ -260,43 +278,59 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
     const validation = ContentFilter.validateInput(topic);
     if (!validation.isValid) {
       setError(validation.reason);
+      showError('El tema no es válido. Intenta con algo más específico.');
       return;
     }
     
     // Mostrar advertencia si no es educativo pero es válido
     if (validation.isWarning) {
       setError(validation.reason);
-      // Permitir continuar pero mostrar advertencia
+      showWarning('Este tema podría no ser puramente académico, pero podemos intentarlo.');
     }
     
-    if (!topic.trim()) return;
+    if (!topic.trim()) {
+      showError('Por favor, escribe un tema que quieras estudiar.');
+      return;
+    }
+    
     setScreen('loading');
+    showInfo(`Generando quiz sobre "${topic}"... Dame un momento.`);
+    
     try {
       const quiz = await generateQuizWithAI(topic);
       setQuestions(quiz); setUserAnswers([]); setScreen('quiz');
       setCurrentQuestion(0); setScore(0); setLives(3); setStreak(0);
+      showSuccess('¡Quiz listo! He preparado preguntas perfectas para tu nivel.');
     } catch (err) {
       setError(err.message); setScreen('input');
+      showError('No pude generar el quiz. Revisa tu conexión e intenta de nuevo.');
     }
   };
 
   const handleGenerateGuide = async () => {
-    if (!topic.trim()) return;
+    if (!topic.trim()) {
+      showError('Necesito un tema para crear tu guía de estudio.');
+      return;
+    }
     setError('');
     
     // Validar el tema antes de enviar
     const validation = ContentFilter.validateInput(topic);
     if (!validation.isValid) {
       setError(validation.reason);
+      showError('El tema no es válido. Intenta con algo más específico.');
       return;
     }
     
     try {
       setScreen('guide_loading');
+      showInfo(`Creando guía sobre "${topic}"... Estoy organizando el contenido perfecto para ti.`);
       const g = await generateGuideWithAI(topic, difficulty);
       setGuide(g); setScreen('guide');
+      showSuccess('¡Guía lista! He preparado contenido estructurado para tu aprendizaje.');
     } catch (err) {
       setError(err.message); setScreen('guide_input');
+      showError('No pude generar la guía. Revisa tu conexión e intenta de nuevo.');
     }
   };
 
@@ -441,6 +475,17 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
     resetPoints();
   };
 
+  const handleOnboardingComplete = () => {
+    // Marcar que el usuario ha visto el onboarding
+    localStorage.setItem('hasSeenOnboarding', 'true');
+    setShowOnboarding(false);
+  };
+
+  // Función para resetear el onboarding (para desarrollo/pruebas)
+  const resetOnboarding = () => {
+    localStorage.removeItem('hasSeenOnboarding');
+    setShowOnboarding(true);
+  };
 
   // ── Render Helpers ───────────────────────────────────────────────────────
   const renderMainContent = () => {
@@ -774,6 +819,13 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
           y={microConfetti.y}
         />
       )}
+      
+      {/* Onboarding Tour para usuarios nuevos */}
+      <OnboardingTour 
+        isVisible={showOnboarding}
+        onComplete={handleOnboardingComplete}
+      />
+      <FeedbackContainer />
     </div>
   );
 }

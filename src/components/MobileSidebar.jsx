@@ -1,13 +1,14 @@
 import React from 'react';
-import { X, Sparkles, BookOpen, FileText, BarChart2, History } from 'lucide-react';
+import { X } from 'lucide-react';
+import { StudyIcons } from './Icon';
 
 const MobileSidebar = ({ isOpen, onClose, currentScreen, onNavigate }) => {
   const NAV_ITEMS = [
-    { id: 'input', label: 'Modo Quiz', icon: <Sparkles size={20} /> },
-    { id: 'guide_input', label: 'Guía IA', icon: <BookOpen size={20} /> },
-    { id: 'study_from_file', label: 'Estudiar Archivo', icon: <FileText size={20} /> },
-    { id: 'stats', label: 'Estadísticas', icon: <BarChart2 size={20} /> },
-    { id: 'history', label: 'Historial', icon: <History size={20} /> },
+    { id: 'input', label: 'Modo Quiz', icon: <StudyIcons.nav.quiz /> },
+    { id: 'guide_input', label: 'Guía IA', icon: <StudyIcons.nav.guide /> },
+    { id: 'study_from_file', label: 'Estudiar Archivo', icon: <StudyIcons.nav.study /> },
+    { id: 'stats', label: 'Estadísticas', icon: <StudyIcons.nav.stats /> },
+    { id: 'history', label: 'Historial', icon: <StudyIcons.ui.menu /> },
   ];
 
   if (!isOpen) return null;
@@ -28,7 +29,7 @@ const MobileSidebar = ({ isOpen, onClose, currentScreen, onNavigate }) => {
             className="mobile-sidebar-close"
             onClick={onClose}
           >
-            <X size={24} />
+            <StudyIcons.ui.close />
           </button>
         </div>
         

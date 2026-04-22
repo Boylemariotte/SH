@@ -194,7 +194,18 @@ const detectResourceType = (item) => {
  */
 const truncateDescription = (description) => {
   if (!description) return "Sin descripción disponible.";
-  const plain = description.replace(/<[^>]*>/g, ""); // quitar HTML si lo hay
+  
+  // Convertir a string si es array
+  let descriptionStr = "";
+  if (Array.isArray(description)) {
+    descriptionStr = description.join(" ");
+  } else if (typeof description === 'string') {
+    descriptionStr = description;
+  } else {
+    descriptionStr = String(description);
+  }
+  
+  const plain = descriptionStr.replace(/<[^>]*>/g, ""); // quitar HTML si lo hay
   return plain.length > 180 ? plain.substring(0, 180) + "..." : plain;
 };
 

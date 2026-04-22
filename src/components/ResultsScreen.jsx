@@ -1,11 +1,11 @@
 import React from 'react';
-import { Trophy, Star, Award } from 'lucide-react';
+import { Trophy, Star, Award, Smile, Brain, Flame, Diamond } from 'lucide-react';
 
 const DIFFICULTY_LABELS = {
-  facil: '😊 Fácil',
-  medio: '🧠 Medio',
-  dificil: '🔥 Difícil',
-  experto: '💎 Experto'
+  facil: { icon: <Smile size={16} />, text: 'Fácil' },
+  medio: { icon: <Brain size={16} />, text: 'Medio' },
+  dificil: { icon: <Flame size={16} />, text: 'Difícil' },
+  experto: { icon: <Diamond size={16} />, text: 'Experto' }
 };
 
 const ResultsScreen = ({ 
@@ -128,7 +128,7 @@ const ResultsScreen = ({
 
           <div className="duo-results-topic">
             Tema: <strong>{topic}</strong><br />
-            Dificultad: <strong>{DIFFICULTY_LABELS[difficulty]}</strong><br />
+            Dificultad: <strong>{DIFFICULTY_LABELS[difficulty].icon} {DIFFICULTY_LABELS[difficulty].text}</strong><br />
             Preguntas: <strong>{totalQuestions}</strong>
           </div>
         </div>

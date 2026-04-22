@@ -591,10 +591,10 @@
 .citation-note {
   margin-top: 1.5rem;
   padding: 0.75rem 1rem;
-  background: #f0fdf4;
+  background: #E4D6F5;
   border-radius: 8px;
-  border-left: 4px solid #10b981;
-  color: #065f46;
+  border-left: 4px solid #7A288A;
+  color: #7A288A;
   font-size: 0.95rem;
 }
 
@@ -784,7 +784,771 @@
   }
 }
 
-/* Estilos para impresión */
+/* ============================================================
+   READING MODE - Comfortable reading experience
+   ============================================================ */
+
+.guide-container.reading-mode {
+  background: #fefefe !important;
+  color: #2c3e50 !important;
+}
+
+.guide-container.reading-mode .guide-header {
+  background: white !important;
+  color: #2c3e50 !important;
+  border-bottom: 2px solid #e1e8ed !important;
+}
+
+.guide-container.reading-mode .guide-title {
+  color: #2c3e50 !important;
+}
+
+.guide-container.reading-mode .guide-meta {
+  color: #7f8c8d !important;
+}
+
+.guide-container.reading-mode .guide-section {
+  background: white !important;
+  color: #2c3e50 !important;
+  border: 1px solid #e1e8ed !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.guide-container.reading-mode .guide-section-header {
+  color: #2c3e50 !important;
+  border-bottom: 2px solid #3498db !important;
+}
+
+.guide-container.reading-mode .guide-section h2,
+.guide-container.reading-mode .guide-section h3 {
+  color: #2c3e50 !important;
+}
+
+.guide-container.reading-mode .guide-text p,
+.guide-container.reading-mode .guide-text li {
+  color: #34495e !important;
+  line-height: 1.8 !important;
+  font-size: 1.05rem !important;
+}
+
+.guide-container.reading-mode .guide-text strong,
+.guide-container.reading-mode .guide-text b {
+  color: #2c3e50 !important;
+  font-weight: 700 !important;
+}
+
+.guide-container.reading-mode .key-questions * {
+  color: #2c3e50 !important;
+}
+
+.guide-container.reading-mode .key-question {
+  background: #f8f9fa !important;
+  border: 1px solid #e9ecef !important;
+  color: #2c3e50 !important;
+}
+
+.guide-container.reading-mode .key-question:hover {
+  background: #f1f3f4 !important;
+  border-color: #dee2e6 !important;
+}
+
+.guide-container.reading-mode .question-number {
+  color: #3498db !important;
+}
+
+.guide-container.reading-mode .guide-tip {
+  background: #e3f2fd !important;
+  border-left: 4px solid #3498db !important;
+  color: #1976d2 !important;
+}
+
+.guide-container.reading-mode .study-tip {
+  background: #f3e5f5 !important;
+  color: #7b1fa2 !important;
+  border: 1px solid #e1bee7 !important;
+}
+
+.guide-container.reading-mode .bibliography h3 {
+  color: #2c3e50 !important;
+  border-bottom: 1px solid #e1e8ed !important;
+}
+
+.guide-container.reading-mode .book-item {
+  background: #f8f9fa !important;
+  border: 1px solid #e9ecef !important;
+}
+
+.guide-container.reading-mode .book-item:hover {
+  background: #f1f3f4 !important;
+}
+
+.guide-container.reading-mode .book-title {
+  color: #2c3e50 !important;
+}
+
+.guide-container.reading-mode .book-icon {
+  color: #3498db !important;
+}
+
+.guide-container.reading-mode .resource-link {
+  background: #f8f9fa !important;
+  border: 1px solid #e9ecef !important;
+  color: #495057 !important;
+}
+
+.guide-container.reading-mode .resource-link:hover {
+  background: #f1f3f4 !important;
+  border-color: #dee2e6 !important;
+  color: #3498db !important;
+}
+
+.guide-container.reading-mode .resource-link strong {
+  color: #2c3e50 !important;
+}
+
+.guide-container.reading-mode .citation-note {
+  background: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+  color: #856404 !important;
+}
+
+.guide-container.reading-mode .guide-actions {
+  background: white !important;
+  border: 1px solid #e1e8ed !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.guide-container.reading-mode .guide-footer {
+  background: white !important;
+  color: #7f8c8d !important;
+  border: 1px solid #e1e8ed !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.guide-container.reading-mode .back-button {
+  background: white !important;
+  color: #3498db !important;
+  border: 2px solid #3498db !important;
+}
+
+.guide-container.reading-mode .back-button:hover {
+  background: #3498db !important;
+  color: white !important;
+}
+
+/* Reading Mode Toggle Button */
+.reading-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.reading-mode-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.reading-mode-toggle.active {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+}
+
+.reading-mode-toggle.active:hover {
+  box-shadow: 0 6px 16px rgba(245, 87, 108, 0.4);
+}
+
+.reading-mode-toggle span {
+  font-size: 0.85rem;
+}
+
+/* Responsive adjustments for reading mode */
+@media (max-width: 768px) {
+  .reading-mode-toggle span {
+    display: none;
+  }
+  
+  .reading-mode-toggle {
+    padding: 0.75rem;
+    border-radius: 50%;
+  }
+  
+  .guide-container.reading-mode .guide-text p,
+  .guide-container.reading-mode .guide-text li {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+  }
+}
+
+/* ============================================================
+   READING MODE FOCUS OVERLAY - Immersive reading experience
+   ============================================================ */
+
+.reading-focus-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.reading-focus-content {
+  background: #fefefe;
+  color: #2c3e50;
+  max-width: 900px;
+  max-height: 85vh;
+  width: 90%;
+  height: auto;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Contenido del modo lectura */
+.reading-focus-content .guide-text {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.reading-focus-content .guide-text p,
+.reading-focus-content .guide-text li {
+  color: #34495e;
+  margin-bottom: 1.2rem;
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+.reading-focus-content .guide-text strong,
+.reading-focus-content .guide-text b {
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.reading-focus-content .guide-text h1,
+.reading-focus-content .guide-text h2,
+.reading-focus-content .guide-text h3 {
+  color: #2c3e50;
+  margin: 2rem 0 1rem 0;
+  font-weight: 700;
+}
+
+.reading-focus-content .guide-text h1 {
+  font-size: 2rem;
+  text-align: center;
+  border-bottom: 3px solid #3498db;
+  padding-bottom: 0.5rem;
+}
+
+.reading-focus-content .guide-text h2 {
+  font-size: 1.5rem;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.3rem;
+}
+
+.reading-focus-content .guide-text h3 {
+  font-size: 1.2rem;
+  color: #34495e;
+}
+
+.reading-focus-content .guide-text ul,
+.reading-focus-content .guide-text ol {
+  margin: 1.5rem 0;
+  padding-left: 2rem;
+}
+
+.reading-focus-content .guide-text li {
+  margin-bottom: 0.8rem;
+}
+
+.reading-focus-content .guide-text blockquote {
+  background: #f8f9fa;
+  border-left: 4px solid #3498db;
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  color: #495057;
+  font-style: italic;
+  border-radius: 0 8px 8px 0;
+}
+
+.reading-focus-content .guide-text code {
+  background: #e9ecef;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #495057;
+}
+
+.reading-focus-content .guide-text pre {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.reading-focus-content .guide-text pre code {
+  background: none;
+  padding: 0;
+}
+
+/* Controles flotantes del modo lectura */
+.reading-mode-controls {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 10000;
+  display: flex;
+  gap: 1rem;
+}
+
+.reading-exit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.reading-exit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(231, 76, 60, 0.4);
+  background: linear-gradient(135deg, #c0392b, #a93226);
+}
+
+.reading-exit-btn span {
+  font-size: 0.95rem;
+}
+
+/* Scrollbar personalizada para modo lectura */
+.reading-focus-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.reading-focus-content::-webkit-scrollbar-track {
+  background: #f1f3f4;
+  border-radius: 4px;
+}
+
+.reading-focus-content::-webkit-scrollbar-thumb {
+  background: #3498db;
+  border-radius: 4px;
+}
+
+.reading-focus-content::-webkit-scrollbar-thumb:hover {
+  background: #2980b9;
+}
+
+/* Responsive adjustments para modo lectura */
+@media (max-width: 768px) {
+  .reading-focus-content {
+    width: 95%;
+    max-height: 90vh;
+    padding: 2rem 1.5rem;
+    border-radius: 12px;
+  }
+  
+  .reading-focus-content .guide-text {
+    font-size: 1rem;
+  }
+  
+  .reading-focus-content .guide-text p,
+  .reading-focus-content .guide-text li {
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+  
+  .reading-focus-content .guide-text h1 {
+    font-size: 1.5rem;
+  }
+  
+  .reading-focus-content .guide-text h2 {
+    font-size: 1.3rem;
+  }
+  
+  .reading-focus-content .guide-text h3 {
+    font-size: 1.1rem;
+  }
+  
+  .reading-mode-controls {
+    top: 1rem;
+    right: 1rem;
+  }
+  
+  .reading-exit-btn span {
+    display: none;
+  }
+  
+  .reading-exit-btn {
+    padding: 0.75rem;
+    border-radius: 50%;
+  }
+}
+
+@media (max-width: 480px) {
+  .reading-focus-content {
+    width: 98%;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+  }
+  
+  .reading-focus-content .guide-text {
+    font-size: 0.9rem;
+  }
+  
+  .reading-focus-content .guide-text p,
+  .reading-focus-content .guide-text li {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  
+  .reading-mode-controls {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+/* ============================================================
+   MOBILE OPTIMIZATIONS - Better centering and layout
+   ============================================================ */
+
+/* Mobile container adjustments */
+@media (max-width: 768px) {
+  .guide-container {
+    padding: 1rem 0.5rem !important;
+    max-width: 100% !important;
+    margin: 0 auto;
+  }
+  
+  .guide-header {
+    flex-direction: column !important;
+    text-align: center !important;
+    padding: 1.5rem 1rem !important;
+    gap: 1rem !important;
+  }
+  
+  .guide-header > div[style*="flex: 1"] {
+    flex: none !important;
+    width: 100%;
+  }
+  
+  .guide-title {
+    font-size: 1.5rem !important;
+    text-align: center !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .guide-meta {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+  
+  .guide-difficulty,
+  .guide-date {
+    display: inline-block !important;
+    text-align: center !important;
+  }
+  
+  .reading-mode-toggle {
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  
+  .guide-content {
+    padding: 1rem !important;
+    max-width: 100% !important;
+  }
+  
+  .guide-layout {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .guide-main-column,
+  .guide-sidebar-column {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .guide-section {
+    margin-bottom: 1rem !important;
+  }
+  
+  .guide-section-header {
+    padding: 1rem !important;
+    text-align: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+  }
+  
+  .guide-section-header h2 {
+    font-size: 1.1rem !important;
+    text-align: center !important;
+  }
+  
+  .guide-section-content {
+    padding: 1rem !important;
+    text-align: left !important;
+  }
+  
+  .back-button {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-bottom: 1rem !important;
+    text-align: center !important;
+  }
+  
+  .guide-actions {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+  }
+  
+  .guide-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  
+  .guide-footer {
+    text-align: center !important;
+    padding: 1rem !important;
+  }
+  
+  /* Center all text elements */
+  .guide-text {
+    text-align: left !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+  
+  .guide-text p,
+  .guide-text li {
+    text-align: left !important;
+    line-height: 1.6 !important;
+    font-size: 0.95rem !important;
+  }
+  
+  .guide-text h1,
+  .guide-text h2,
+  .guide-text h3 {
+    text-align: center !important;
+  }
+  
+  /* Center key questions */
+  .key-questions p {
+    text-align: center !important;
+  }
+  
+  .key-question {
+    text-align: left !important;
+  }
+  
+  /* Center bibliography items */
+  .book-item {
+    text-align: left !important;
+  }
+  
+  .resource-link {
+    text-align: left !important;
+  }
+  
+  .citation-note p {
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .guide-container {
+    padding: 0.5rem !important;
+  }
+  
+  .guide-header {
+    padding: 1rem 0.75rem !important;
+  }
+  
+  .guide-title {
+    font-size: 1.3rem !important;
+  }
+  
+  .guide-content {
+    padding: 0.75rem !important;
+  }
+  
+  .guide-section-header {
+    padding: 0.75rem !important;
+  }
+  
+  .guide-section-content {
+    padding: 0.75rem !important;
+  }
+  
+  .guide-text p,
+  .guide-text li {
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+  }
+  
+  .reading-mode-toggle {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+  
+  .reading-mode-toggle span {
+    font-size: 0.8rem !important;
+  }
+  
+  .back-button {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+/* Ensure proper centering for all screen sizes */
+.guide-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.guide-layout {
+  display: flex;
+  gap: 2rem;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.guide-main-column {
+  flex: 2;
+  min-width: 0;
+}
+
+.guide-sidebar-column {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Fix any overflow issues */
+.guide-section {
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.guide-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Ensure buttons don't overflow */
+.guide-actions button,
+.reading-mode-toggle,
+.back-button {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .guide-actions button,
+  .reading-mode-toggle,
+  .back-button {
+    white-space: normal;
+    text-overflow: initial;
+  }
+}
+@media print {
+  .reading-focus-overlay {
+    position: static;
+    background: white;
+    backdrop-filter: none;
+  }
+  
+  .reading-focus-content {
+    max-width: 100%;
+    max-height: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+  
+  .reading-mode-controls {
+    display: none !important;
+  }
+}
+@media print {
+  .guide-container.reading-mode {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .reading-mode-toggle {
+    display: none !important;
+  }
+}
 @media print {
   .guide-container {
     box-shadow: none;
