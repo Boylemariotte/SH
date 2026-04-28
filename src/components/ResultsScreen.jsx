@@ -1,5 +1,6 @@
 import React from 'react';
 import { Trophy, Star, Award, Smile, Brain, Flame, Diamond } from 'lucide-react';
+import AIFeedback from './AIFeedback';
 
 const DIFFICULTY_LABELS = {
   facil: { icon: <Smile size={16} />, text: 'Fácil' },
@@ -16,10 +17,30 @@ const ResultsScreen = ({
   difficulty,
   earnedPoints,
   totalPoints, 
-  onRestart 
+  onRestart,
+  questions,
+  userAnswers
 }) => {
   const percentage = Math.round((correctAnswers / totalQuestions) * 100);
   const passed = percentage >= 60;
+
+  const handleFeedbackAction = (action) => {
+    switch (action) {
+      case 'Practicar preguntas específicas':
+        onRestart();
+        break;
+      case 'Generar guía de estudio':
+        if (window.onNavigateToGuide) {
+          window.onNavigateToGuide(topic);
+        }
+        break;
+      case 'Intentar nuevo quiz':
+        onRestart();
+        break;
+      default:
+        console.log('Acción no implementada:', action);
+    }
+  };
 
   return (
     <div className="duo-container">
@@ -36,7 +57,7 @@ const ResultsScreen = ({
           )}
           
           <h1 className="duo-title">
-            {passed ? '¡Felicitaciones! 🎉' : '¡Buen Intento! 💪'}
+            {passed ? '¡Felicitaciones!' : '¡Buen Intento!'}
           </h1>
           <p className="duo-subtitle">
             {passed ? 'Has completado el quiz exitosamente' : 'Sigue practicando para mejorar'}
@@ -73,7 +94,6 @@ const ResultsScreen = ({
             <div className="duo-results-percentage-label">de aciertos</div>
           </div>
           
-          {/* Puntos ganados */}
           <div style={{
             background: earnedPoints > 0 
               ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
@@ -103,12 +123,12 @@ const ResultsScreen = ({
                 borderRadius: '8px',
                 fontWeight: 'bold'
               }}>
-                🎯 ¡Perfecto! Obtuviste todos los puntos
+                <Trophy size={16} className="inline mr-2" />
+                ¡Perfecto! Obtuviste todos los puntos
               </div>
             )}
           </div>
           
-          {/* Total de puntos acumulados */}
           <div style={{
             marginTop: '16px',
             padding: '16px',
@@ -133,12 +153,51 @@ const ResultsScreen = ({
           </div>
         </div>
 
+        {questions && userAnswers && (
+          <div style={{ marginTop: '24px' }}>
+            <AIFeedback 
+              questions={questions}
+              userAnswers={userAnswers}
+              topic={topic}
+              difficulty={difficulty}
+              onAction={handleFeedbackAction}
+            />
+          </div>
+        )}
+
         <button
           onClick={onRestart}
-          className="duo-btn duo-btn-success"
+          className="btn btn-primary btn-shimmer duo-btn duo-btn-success"
           aria-label="Crear un nuevo quiz"
+          style={{
+            marginTop: '24px',
+            padding: '12px 24px',
+            fontSize: '1rem',
+            fontWeight: '700',
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 20px rgba(99, 102, 241, 0.4)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.3)';
+          }}
         >
-          Nuevo Quiz
+          <span style={{ position: 'relative', zIndex: 1 }}>✨ Nuevo Quiz</span>
         </button>
       </div>
     </div>

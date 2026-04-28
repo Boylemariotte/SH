@@ -23,6 +23,7 @@ import FeedbackToast, { useFeedback, FeedbackContainer } from './components/Feed
 import AIRevealText from './components/AIRevealText';
 import GuideViewer from './components/GuideViewer';
 import GuideInput from './components/GuideInput';
+import ResultsScreen from './components/ResultsScreen';
 import { usePoints } from './hooks/usePoints';
 import './styles/guideStyles.css';
 import './styles/quizHistory.css';
@@ -32,6 +33,7 @@ import './styles/onboarding.css';
 import './styles/feedback.css';
 import './styles/icons.css';
 import './styles/color-palette.css';
+import './styles/aiFeedback.css';
 
 // URL dinámica de la API
 const getApiUrl = () => {
@@ -614,30 +616,18 @@ Escribe contenido extenso y detallado para cada sección.Usa títulos con Markdo
       return (
         <div className="loading-screen" style={{ minHeight: '60vh', padding: 0 }}>
           <div className="loading-card" style={{ maxWidth: 500 }}>
-            <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
-              {pct >= 80 ? '🏆' : pct >= 50 ? '🎯' : '💪'}
-            </div>
-            <div className="results-score-big">{pct}%</div>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              <AIRevealText text="Precisión Final" delay={300} />
-            </p>
-            <div className="results-breakdown">
-              <div className="results-item results-item-correct">
-                <div className="results-num">{correctAnswers}</div>
-                <div className="results-num-label">Correctas</div>
-              </div>
-              <div className="results-item results-item-incorrect">
-                <div className="results-num">{questions.length - correctAnswers}</div>
-                <div className="results-num-label">Incorrectas</div>
-              </div>
-            </div>
-            {earnedPoints > 0 && (
-              <div style={{ background: 'var(--accent-light)', border: '1px solid var(--border-hover)', borderRadius: 12, padding: '0.75rem', marginBottom: '1rem', color: 'var(--accent)', fontWeight: 700 }}>
-                <Award size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-                +{earnedPoints} puntos ganados
-              </div>
-            )}
-            <button className="btn btn-primary" onClick={handleRestart}>Volver al inicio</button>
+            <ResultsScreen 
+              score={score}
+              correctAnswers={correctAnswers}
+              totalQuestions={questions.length}
+              topic={topic}
+              difficulty={difficulty}
+              earnedPoints={earnedPoints}
+              totalPoints={totalPoints}
+              onRestart={handleRestart}
+              questions={questions}
+              userAnswers={userAnswers}
+            />
           </div>
         </div>
       );

@@ -1,0 +1,369 @@
+/* AI Feedback Component Styles */
+.ai-feedback-section {
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.feedback-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Loading State */
+.feedback-loading {
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.feedback-loading h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 16px 0 8px 0;
+}
+
+.feedback-loading p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Error State */
+.feedback-error {
+  text-align: center;
+  padding: 20px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+  color: #ef4444;
+}
+
+/* Feedback Sections */
+.feedback-strengths,
+.feedback-specific-errors,
+.feedback-concepts,
+.feedback-recommendations {
+  margin-bottom: 24px;
+}
+
+.feedback-strengths h4,
+.feedback-specific-errors h4,
+.feedback-concepts h4,
+.feedback-recommendations h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.feedback-strengths ul,
+.feedback-specific-errors ul,
+.feedback-concepts ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feedback-strengths li,
+.feedback-specific-errors li,
+.feedback-concepts li {
+  padding: 8px 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.feedback-strengths li {
+  color: #10b981;
+}
+
+.feedback-specific-errors li {
+  color: #ef4444;
+}
+
+.feedback-concepts li {
+  color: #f59e0b;
+}
+
+.feedback-concepts li strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Recommendations Grid */
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.recommendation-card {
+  background: var(--accent-light);
+  border: 1px solid var(--border-hover);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  border-color: var(--accent);
+}
+
+.recommendation-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  justify-content: space-between;
+}
+
+.recommendation-header h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0;
+}
+
+.priority-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #ef4444;
+  color: white;
+}
+
+.priority-high {
+  border-left: 4px solid #ef4444;
+}
+
+.priority-medium {
+  border-left: 4px solid #f59e0b;
+}
+
+.recommendation-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 8px 0 12px 0;
+}
+
+.recommendation-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.btn-outline:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* Motivation Section */
+.feedback-motivation {
+  margin: 24px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--accent-light), rgba(99, 102, 241, 0.05));
+  border: 1px solid var(--border-hover);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.motivation-quote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.motivation-quote p {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--accent);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Achievement Badge */
+.feedback-achievement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+/* Enhanced Nuevo Quiz Button */
+.duo-btn.duo-btn-success {
+  position: relative;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+  border: none;
+  color: white;
+  font-weight: 700;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.duo-btn.duo-btn-success::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.duo-btn.duo-btn-success:hover::before {
+  left: 100%;
+}
+
+.duo-btn.duo-btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.duo-btn.duo-btn-success:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+/* Shimmer Effect */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ai-feedback-section {
+    padding: 16px;
+    margin-top: 16px;
+  }
+  
+  .recommendations-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .recommendation-card {
+    padding: 12px;
+  }
+  
+  .feedback-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .feedback-strengths h4,
+  .feedback-improvements h4,
+  .feedback-recommendations h4 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-feedback-section {
+    padding: 12px;
+  }
+  
+  .feedback-loading {
+    padding: 20px 12px;
+  }
+  
+  .recommendation-actions {
+    flex-direction: column;
+  }
+  
+  .btn-sm {
+    width: 100%;
+    text-align: center;
+  }
+}
